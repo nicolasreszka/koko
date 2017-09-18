@@ -56,7 +56,7 @@ int main(void){
       exit(1);
     }
     if(x > 0){ //père
-      //Le père boucle simplement et attend le prochain char.
+      //Le père boucle simplement et attend la prochaien requete de l'utilisateur (ici, le prochain char).
     }
   }
 
