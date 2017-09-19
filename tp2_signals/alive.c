@@ -1,3 +1,7 @@
+/*	Auteur : Nicolas Reszka 
+*	Fonction : affiche toute les 2sec son PID et la phrase "I am alive" 
+*/
+
 #include "stdio.h"
 #include "stdlib.h"
 #include "unistd.h"
