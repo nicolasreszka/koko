@@ -41,9 +41,9 @@ int main(int argc, char** argv) {
 		pthread_create(&thread[i], NULL, start_routine, (void*)&i);	
 
 		/* A chaque tour de boucle, on crée un thread auquel on associe la routine
-	     * "start_routine", et on passe en argument la variable i, qui vaut donc
-	     * 0 au premier tour, 1 au suivant, et 2 pour le dernier thread.
-	    */
+		 * "start_routine", et on passe en argument la variable i, qui vaut donc
+		 * 0 au premier tour, 1 au suivant, et 2 pour le dernier thread.
+		*/
 	}
 	pthread_join(thread[0], NULL);
 
