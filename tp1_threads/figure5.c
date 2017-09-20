@@ -21,7 +21,7 @@
 		-Qf crée Qff
 		-Qf meurt -> X
 		-Qff crée Qfff
-		-Qff meurt ->X
+		-Qff meurt -> X
 		-Qfff crée Qffff
 		-etc... 
 	
