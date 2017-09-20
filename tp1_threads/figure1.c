@@ -5,8 +5,8 @@ Dans les arbres de processus de koko (appelés gdf) :
 	- "Qff" = processus fils du fils
 	etc...
 
-	- "S" = le processus attend (ex: sleep(5))
-	- "O" = le processus tourne dans une boucle infinie (ex: while(1))
+	- "S" = le processus attend un évènement quelconque (ex: scanf())
+	- "O" = le processus execute une boucle infinie (ex: while(1))
 	- "x" = le processus meurt
 */
 
@@ -17,11 +17,15 @@ Dans les arbres de processus de koko (appelés gdf) :
 /* Ce programme correspond au gdf suivant :
 	Q
 	|\
-	| \	Qf
+	| \ Qf
 	|  \
 	O   O
 
 	Fig. 1
+
+	Dans ce programme : 
+		-Q crée Qf puis execute une boucle infinie -> O, 
+		-Qf execute une boucle infinie -> O
 */
 
 int main(int argc, char** argv) {
