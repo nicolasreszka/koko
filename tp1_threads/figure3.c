@@ -47,7 +47,7 @@ int main(int argc, char** argv) {
 		/* Le deuxième fork() à échoué */
 		if (pid2 == -1) {
 			perror("Erreur au fork 2");
-			return -1;
+			exit(1);
 		}
 		
 		/* Code du deuxième fils */
