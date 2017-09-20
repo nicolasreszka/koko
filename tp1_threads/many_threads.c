@@ -21,10 +21,10 @@ void* start_routine(void *arg) {
    	int x = *(int*) arg; 
 
 	while(1){
-		printf("Thread number %d :\n", *((int*) arg));
+		printf("Thread number : %d \n", *((int*) arg));
 		printf("PID : %d\n", getpid());
 		printf("TID : %d\n", gettid());
-		printf("PTHID : %d\n", pthread_self());
+		printf("PTHID : %lu\n", pthread_self());
 		sleep(5);
 	}
 	pthread_exit(NULL);
