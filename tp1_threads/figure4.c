@@ -46,6 +46,8 @@ int main() {
 	if (pid > 0) {
 		printf("PID père : %d\n", getpid());
 		sleep(5);
+
+		/* Retour au début */
 		goto loop;
 	}
 
