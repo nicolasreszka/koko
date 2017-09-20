@@ -14,10 +14,10 @@
 	|     \ \
 	O     X  O
 
-	Fig. 2
+	Fig. 3
 
 	Dans ce programme : 
-		-Q crée Qf1 et Qf2 puis execute une boucle infinie -> O, 
+		-Q crée Qf1 et Qf2 puis execute une boucle infinie -> O
 		-Qf1 execute une boucle infinie -> O
 		-Qf2 meurt -> X
 */
