@@ -1,10 +1,10 @@
 #include "stdio.h"
 #include "stdlib.h"
 #include "unistd.h"
+#include "sys/types.h"
 
-int main(int argc, char** argv) {
-	
-	printf("pid = %d\ngroup id = %d\nsession id = %d\n", getpid(), getpgid(getpid()), getppid());
+int main() {
+	printf("PID = %d\n Group ID = %d\n Session ID = %d\n", getpid(), getpgid(getpid()), getsid(getppid());
 
 	return EXIT_SUCCESS;
 }
