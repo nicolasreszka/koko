@@ -19,19 +19,19 @@ figure6.o : figure6.c
 	gcc -c figure6.c
 
 figure7.o : figure7.c
-	gcc -c -lpthread figure7.c
+	gcc -c figure7.c
 
 show_ids.o : show_ids.c
 	gcc -c show_ids.c
 
 many_threads.o : many_threads.c
-	gcc -c -lpthread many_threads.c
+	gcc -c many_threads.c
 
 lead.o : lead.c
 	gcc -c lead.c
 
 daemon.o : daemon.c
-	gcc -c -lpthread daemon.c
+	gcc -c daemon.c
 
 figure1 : figure1.o
 	gcc -o figure1 figure1.o
@@ -52,19 +52,19 @@ figure6 : figure6.o
 	gcc -o figure6 figure6.o
 
 figure7 : figure7.o
-	gcc -o figure7 figure7.o
+	gcc -lpthread -o figure7 figure7.o
 
 show_ids : show_ids.o
 	gcc -o show_ids show_ids.o
 
 many_threads : many_threads.o
-	gcc -o many_threads many_threads.o
+	gcc -lpthread -o many_threads many_threads.o
 
 lead : lead.o
 	gcc -o lead lead.o
 
 daemon : daemon.o
-	gcc -o daemon daemon.o
+	gcc -lpthread -o daemon daemon.o
 
 clean:
 	rm *.o

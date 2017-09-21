@@ -4,7 +4,7 @@
 #include "sys/types.h"
 
 int main() {
-	printf("PID = %d\n Group ID = %d\n Session ID = %d\n", getpid(), getpgid(getpid()), getsid(getppid());
+	printf("PID = %d\n Group ID = %d\n Session ID = %d\n", getpid(), getpgid(getpid()), getsid(getppid()));
 
 	return EXIT_SUCCESS;
 }
