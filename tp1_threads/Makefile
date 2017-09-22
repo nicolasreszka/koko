@@ -1,4 +1,4 @@
-All : figure1 figure2 figure3 figure4 figure5 figure6 figure7 show_ids many_threads lead daemon clean
+All : figure1 figure2 figure3 figure4 figure5 figure6 figure7 show_ids many_threads lead iamzombie daemon clean
 
 figure1.o : figure1.c
 	gcc -c figure1.c
@@ -29,6 +29,9 @@ many_threads.o : many_threads.c
 
 lead.o : lead.c
 	gcc -c lead.c
+
+iamzombie.o : iamzombie.c
+	gcc -c iamzombie.c
 
 daemon.o : daemon.c
 	gcc -c daemon.c
@@ -62,6 +65,9 @@ many_threads : many_threads.o
 
 lead : lead.o
 	gcc -o lead lead.o
+
+iamzombie : iamzombie.o
+	gcc -o iamzombie iamzombie.o
 
 daemon : daemon.o
 	gcc -lpthread -o daemon daemon.o
