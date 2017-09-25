@@ -39,7 +39,7 @@ int main(int argc, char ** argv) {
 	} else {
 		/* On met la valeur de x dans l'adresse */
 		*adresse = x;
-		printf("La valeur %d à l'adresse %p\n", x, adresse);
+		printf("La valeur %d a été écrite à l'adresse %p\n", x, adresse);
 	}
 
 	return EXIT_SUCCESS;
