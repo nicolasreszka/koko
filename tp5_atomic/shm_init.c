@@ -54,7 +54,7 @@ int main(int argc, char** argv) {
 	 * Arguments : 
 	 * 	- key : la clé créée avec ftok()
 	 *	- size : le nombre d'octets k à partager
-	 *  - shmflg : ici on utilise IPC_CREAT pour crééer un nouveau segment et 
+	 *	- shmflg : ici on utilise IPC_CREAT pour crééer un nouveau segment et 
 	 *	  IPC_EXCL pour éviter que le segment ne se crée si il existe déjà
 	 *	  0666 correspond aux permissions
 	*/ 
