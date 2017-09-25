@@ -27,7 +27,7 @@ void main(void)
 	##################################################
 	*/
 
-	else if( pidPf1 == 0)
+	if( pidPf1 == 0)
 	{
 		pidPf1f1 = fork();
 
@@ -43,13 +43,13 @@ void main(void)
 		##################################################
 		*/
 
-		else if( pidPf1f1 == 0)
+		if( pidPf1f1 == 0)
 		{
 			close(pp[1]);
 			while(1)
 			{
 				read(pp[0],&rest,4);
-				printf("ici Pf1f1 je lis %d dans le tube\n",rest);
+				printf("ici Pf1f1 : %d je lis %d dans le tube\n",getpid(),rest);
 				sleep(1);
 			}
 		}
@@ -64,7 +64,7 @@ void main(void)
 	##################################################
 	*/
 
-	else if ( pidPf1 > 0)
+	if ( pidPf1 > 0)
 	{
 		pidPf2 = fork();
 		if( pidPf2 == -1)
@@ -78,18 +78,19 @@ void main(void)
 		#                    code Pf2                    #
 		##################################################
 		*/
-		else if ( pidPf2 == 0)
+		if ( pidPf2 == 0)
 		{
 			close(pp[0]);
+			rese = getpid();
 			while(1)
 			{
-				rese = getpid();
+				rese++;			
 				write(pp[1],&rese,4);
-				printf("Ici pf2, J'écris %d dans le tube.\n",rese);
+				printf("Ici pf2: %d, J'écris %d dans le tube.\n",getpid(),rese);
 				sleep(3);
 			}
 		}
-		else if(pidPf2 > 0)
+		if(pidPf2 > 0)
 		{
 			close(pp[0]);
 			close(pp[1]);
