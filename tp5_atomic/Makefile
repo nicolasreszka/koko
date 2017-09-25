@@ -1,10 +1,10 @@
-All : shmini clean
+All : shm_init clean
 
-shmini.o : shmini.c
-	gcc -c shmini.c
+shm_init.o : shm_init.c
+	gcc -c shm_init.c
 
-shmini : shmini.o
-	gcc -o shmini shmini.o
+shm_init : shm_init.o
+	gcc -o shm_init shm_init.o
 
 clean:
 	rm *.o
