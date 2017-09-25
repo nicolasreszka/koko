@@ -42,7 +42,7 @@ int main(int argc, char** argv) {
 	key = ftok("/tmp",'a');
 
 	if (key < 0) {
-		perror("ftok error");
+		perror("ftok");
 	} else {
 		printf("ftok success\n");
 	}
@@ -61,7 +61,7 @@ int main(int argc, char** argv) {
 	id = shmget(key, size, 0666|IPC_CREAT|IPC_EXCL);
 
 	if (id < 0) {
-		perror("shmget error");
+		perror("shmget");
 	} else {
 		printf("shmget success\n");
 	}
