@@ -1,0 +1,67 @@
+
+  NB: TOUS LE PROGRAMMES QU'ON VOUS DEMANDE DE FAIRE DOIVENT PERMETTRE
+      L"EXECUTION EN CONCURENCE PAR PLUSIEURS PROCESSUS/THREADS.
+
+                CONSEILS METHODOLOGIQUES
+  (1)
+     choisissez un modele de concurence (processus ou threads) que
+     vous allez utiliser dans vos programmes. le nombre de processus
+     (threads) utlises doit etre un parametre accepte par vos
+     programmes, en particulier il peut etre egale a 1.
+
+  (2)
+     vos programmes doivent traiter un fichier a l'aide des plusieurs
+     participants (processus ou threads). prevoyez une repartition de
+     travail d'une facon equitable -- par exemple, chaque participant
+     obtient sa partie du fichier et les tailles des parties sont
+     pareilles (peut etre a une seule exception)
+
+                  CONSEIL PRATIQUE
+
+     utilisez les fonctions 'pread', 'pwrite' a la place de 'read','write'.
+     cela vous permet d'eviter une certaine interference entre les processus
+     (threads)
+
+                   TRAVAIL A FAIRE
+
+     vous trouvez dans le sous-repertoire 'Files' trois fichiers:
+     - 'maxima.txt' (format UTF-8) qui va vous servir pour certains essais
+     - 'foo.dat' -- le resultat du cryptage (vous devrez le decrypter)
+     - 'parms.dat' qui contient trois valeurs:
+       --  la clef (unsigned short)
+       --  la distance de la rotation (entre 0 (exclu) et 8 (exclu)) (unsigned char)
+       --  le sens de la rotation (1 vers la gauche, -1 vers la droite) (char)
+
+
+  (1)
+     ecrivez un programme 'k_encrypt_multi' qui, etant donnes un entier N
+     (N>=1) un fichier quelconque 'foo' et le fichier 'parms.dat' qui definit
+     une clef et les parametres de la rotation, engendre N processus (threads)
+     qui _ensemble_ construisent le fichier 'bar' -- le resulatat de l'application
+     de la procedure decrite dans le fichier 'defs.txt'
+
+  (2)
+     ecrivez un programme 'k_decrypt_multi' qui, etant donnes un entier N
+     (N>=1), un fichier 'bar' et un fichier 'parms.dat' qui definit une clef
+     et les parametres de la rotation, sachant que 'bar' est le resultat de
+     l'application de la procedure, decrite dans le fichier 'defs.txt',
+     a un certain fichier 'foo', restitue le "fichier d'origine" 'foo' et
+     que ce travail soit fait par K processus (threads).
+
+  (3)
+     testez vos programmes avec le fichier 'maxima.txt' (en format UTF-8)
+     et 'parms.dat' qui se trouvent dans le sous-repertoire 'Files'.
+     essayez plusieurs valeurs de K (nombres de processus/threads).
+
+  (4)
+     le fichier 'parms.dat' qui se trouve dans le sous-repertoire 'Files',
+     definit la clef et les parametres de la rotation. le fichier 'foo.dat'
+     qui se trouve dans le meme sous-repertoire, est le resulat de
+     l'application de la procedure, decrite dans le fichier 'defs.txt'.
+     restituez, avec votre programme 'k_decrypt_multi' le "fichier d'origine"
+     -- vouz devez obtenir un fichier en format UTF-8, appelez le 'foo.txt'.
+     lisez le.
+
+  (5)
+     mettez les sources de vos programmes dans le sous-repertoire 'Src',
+     mettez le fichier restitue ('foo.txt') dans le sous-repertoire 'Files'

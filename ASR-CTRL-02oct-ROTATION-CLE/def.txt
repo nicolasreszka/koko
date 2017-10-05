@@ -1,0 +1,73 @@
+
+  soit un code binaire sur k bits:
+
+       x = b   b   ... b b b  .
+            k-1 k-2     2 1 0
+
+  DEFINITION
+  rotation de x vers la droite a 1 est le code
+
+  rotr1(x) = b b   b   ... b b   .
+              0 k-1 k-2     2 1
+              
+  rotation de x vers la droite a i (rotr(x,i)) c'est rotr1(x) repete i fois (0<i<k).
+
+  DEFINITION
+  rotation de x vers la gauche a 1 est le code
+
+  rotl1(x) =  b   ... b b b b   .
+               k-2     2 1 0 k-1
+              
+  rotation de x vers la gauche a i (rotl(x,i)) c'est rotl1(x) repete i fois (0<i<k).
+  
+  par exemple
+     10000001 --rotr(.,2)--> 01100000
+     10000001 --rotl(.,3)--> 00001100
+
+  DEFINITION
+  XOR est la fonction booleenne suivante:
+      x | y || x XOR y
+      --+---++---------
+      0 | 0 ||    0
+      0 | 1 ||    1
+      1 | 0 ||    1
+      1 | 1 ||    0
+      --+---++---------
+
+  une propriete importante de cette fonction est comme suit:
+      pour tous x,y
+      (x XOR y) XOR y = x
+
+  autrement dit, etant donnes (x XOR y) et y, on peut toujours trouver x.
+  
+  cette fonction est frequemment utilisee dans les algorithmes de cryptage
+  (habitiellement avec une donnee supplementaire qu'on appelle "une clef") 
+
+  voici un exemple (extremement simplifie) d'une telle utilisation.
+
+  soit un code 'key' sur 16 bits -- la clef. decoupons la clef en 2
+                           +--------+--------+
+  octets k[0] et k[1]: key |  k[1]  |  k[0]  |
+                           +--------+--------+
+  soit un fichier 'foo'. considerons la procedure suivante:
+     - on lit le fichier 'foo' octet par octet
+     - soit l'octet numero i, on fait avec:
+         >  la rotation (disons, a 3 vers la gauche)
+         >  XOR avec k[b] ou b est la valeur du bit numero i(mod 16) de la clef
+     - on ecrit le resultat dans un autre fichier
+
+  foo:                |---octet----|---octet----|---octet----| ...
+                         rotl(.,3)    rotl(.,3)    rotl(.,3) ...
+                          XOR          XOR          XOR    ...
+                         k[.]         k[.]         k[.]
+                           |           |            |     ...
+                           v           v            v   ...
+  encr(clef,l,3,foo): |---octet----|---octet----|---octet----| ...
+
+  cette procedure permet de "crypter" le fichier 'foo'. NB le resultat
+  de ce cryptage d'un octet ne depend pas d'autres octets de meme
+  fichier, par consequent cette procedure peut etre "parallelisee"
+  c.a.d. on peut confier cette tache a plusieurs processus qui
+  travaillent simultanement. 
+
+
