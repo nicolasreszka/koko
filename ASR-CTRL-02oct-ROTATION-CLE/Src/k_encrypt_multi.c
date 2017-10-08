@@ -14,8 +14,10 @@ struct param{
   char sens;
   int fd_destination;
   int fd_fileToRead;
-  int fileToRead_size;
   unsigned char key_array[2];
+  int actual_byte;
+  int size_to_read;
+  int num_thread;
 };
 typedef struct param parametres;
 
@@ -88,27 +90,24 @@ unsigned char* do_perm(parametres* param, unsigned char* buff, int actual_byte){
 
 void* start_routine(void* arg){
   parametres* param = (parametres*) arg;
-  int num_thread = (gettid() - getpid())%nb_threads;
-  printf("THREAD créé, num = %d,PID = %d, TID = %d\n", num_thread, getpid(), gettid());
-
-  int actual_byte = param->fileToRead_size/nb_threads * num_thread;
-  int size_to_read = param->fileToRead_size/nb_threads;
-  printf("Thread n°%d Octet de départ = %d Nombre d'octets à analyser = %d\n",num_thread, actual_byte, size_to_read );
+  printf("THREAD créé, num = %d,PID = %d, TID = %d\n", param->num_thread, getpid(), gettid());
+  printf("Thread n°%d Octet de départ = %d Nombre d'octets à analyser = %d\n",param->num_thread, param->actual_byte, param->size_to_read);
   unsigned char buff;
   int y = -1;
   int i = 0;
-  while( y != 0 && (size_to_read != 0)){
-    y = pread(param->fd_fileToRead, &buff, 1, actual_byte);
-    unsigned char* byte = do_perm(param, &buff, actual_byte);
-    pwrite(param->fd_destination, byte, 1, actual_byte);
-    actual_byte++;
-    size_to_read--;
+  while((param->size_to_read != 0) &&(y!=0)){
+    y = pread(param->fd_fileToRead, &buff, 1, param->actual_byte);
+    unsigned char* byte = do_perm(param, &buff, param->actual_byte);
+    pwrite(param->fd_destination, byte, 1, param->actual_byte);
+    param->actual_byte++;
+    param->size_to_read--;
   }
-  return NULL;}
+  return NULL;
+}
 
 int main(int argc, char ** argv) {
 
-  parametres param = {0,0,0,0,0,0,{0,0}};
+  parametres param = {0,0,0,0,0,{0,0}, 0, 0, -1};
 
 
   if(argc != 4) {
@@ -154,20 +153,33 @@ int main(int argc, char ** argv) {
 
   param.fd_fileToRead = fd_fileToRead;
   param.fd_destination = fd_destination;
-  param.fileToRead_size = getSizeOfFile(fd_fileToRead);
+  int fileToRead_size = getSizeOfFile(fd_fileToRead);
 
   unsigned short key_tmp = param.key;
   param.key_array[0] = (char)(key_tmp & 0xff);
   param.key_array[1] = (char)((key_tmp >> 8) & 0xff);
+  struct timespec tim, tim2;
+     tim.tv_sec = 0;
+     tim.tv_nsec = 5000000L;
+  int sizeToReadThread = fileToRead_size/nb_threads;
   int offset = 0;
   pthread_t th[nb_threads];
 
   for(int i = 0; i < nb_threads; i++){
-    pthread_create(&th[i], NULL, start_routine, &param);
+    parametres param_th = {param.key, param.distance, param.sens, param.fd_destination, param.fd_fileToRead,
+      {param.key_array[0], param.key_array[1]}, offset, sizeToReadThread, i};
+    if( i < (fileToRead_size % nb_threads)){
+      param_th.size_to_read += 1 ;
+    }
+    offset = offset + param_th.size_to_read;
+    //printf("%d OFFSET\n", param_th.size_to_read);
+
+    pthread_create(&th[i], NULL, start_routine, &param_th);
+    //sleep(0.1);
+    nanosleep(&tim , &tim2);
   }
   for(int i = 0; i < nb_threads; i++){
     pthread_join(th[i], NULL);
   }
-
   return 0;
 }
