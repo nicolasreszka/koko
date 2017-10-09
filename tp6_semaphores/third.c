@@ -37,7 +37,7 @@ int main(int argc, char** argv) {
 		return EXIT_FAILURE;
 	}
 
-	print_word_letter_by_letter("first", atoi(argv[1]));
+	print_word_letter_by_letter("third", atoi(argv[1]));
 
 	return EXIT_SUCCESS;
 }
