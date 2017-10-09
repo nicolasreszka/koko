@@ -37,7 +37,7 @@ int main(int argc, char** argv) {
 	 * Arguments : 
 	 * 	- pathname : le chemin vers le fichier
 	 *	- proj_id : l'identifiant du projet, c'est un int mais seuls 
-	 *    les 8bits de poids faibles sont utilisés donc on peut mettre un char 
+	 *	  les 8bits de poids faibles sont utilisés donc on peut mettre un char 
 	*/ 
 	key = ftok("/tmp",'a');
 
