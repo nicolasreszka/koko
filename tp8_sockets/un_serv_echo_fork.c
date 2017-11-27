@@ -48,6 +48,7 @@ int main(int argc, char** argv) {
 		perror("setsockopt");
 	}
 
+	unlink(local.sun_path)
 	bind_result = bind(socket_id, (struct sockaddr*)&local, sizeof(local));
 	if (bind_result == -1) {
 		perror("bind");
