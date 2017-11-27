@@ -9,20 +9,12 @@
 
 #define MESSAGE_SIZE 109
 
-void sigchild_handler(int signal) {
-	while(waitpid(-1, NULL, WNOHANG) > 0);
-}
-
 int main(int argc, char** argv) {
-	if (argc < 3) {
-		printf("usage : %s <chemin du fichier> <message à envoyer>\n", argv[0]);
+	if (argc < 2) {
+		printf("usage : %s <chemin du fichier>\n", argv[0]);
 		return EXIT_FAILURE;
 	}	
-
-	struct sigaction sa;
-	sa.sa_handler = &sigchild_handler;
-	sigemptyset(&sa.sa_mask);
-	sa.sa_flags = SA_RESTART;
+	int read_result, send_result, recv_result;
 
 	socklen_t sockaddr_un_size;
 	sockaddr_un_size = sizeof(struct sockaddr_un);
@@ -32,28 +24,41 @@ int main(int argc, char** argv) {
 	local.sun_family = AF_UNIX;
 	strncpy(local.sun_path, argv[1], 108);
 
-	int socket_id;
+	int socket_id, pid;
 	char message[MESSAGE_SIZE];
-	strncpy(message, argv[2], MESSAGE_SIZE);
+	
 
-	socket_id=socket(AF_UNIX,SOCK_STREAM,0);
-	if (socket_id < 0) {
-		perror("socket");
-	}
+	while(1) {
+		memset(message, '\0', MESSAGE_SIZE);
 
-	if (connect(socket_id, (struct sockaddr*)&local, sockaddr_un_size) < 0) {
-		perror("connect");
-	}
-
-	if (send(socket_id,message,MESSAGE_SIZE, MSG_EOR) < 0) {
-		perror("send");
-	} else {
-		if (recv(socket_id,message,MESSAGE_SIZE, MSG_WAITALL) < 0) {
-			perror("recv");
-		} else {
-			printf("%s\n", message);
+		socket_id=socket(AF_UNIX,SOCK_STREAM,0);
+		if (socket_id < 0) {
+			perror("socket");
 		}
-	}
 
+		if (connect(socket_id, (struct sockaddr*)&local, sockaddr_un_size) < 0) {
+			perror("connect");
+		}
+
+		printf("message ?\n");
+		read_result = read(0,message,MESSAGE_SIZE);
+		if (read_result == -1) {
+			perror("read");
+		} else {
+			send_result = send(socket_id,message,MESSAGE_SIZE,0);
+			if (send_result == -1) {
+				perror("send");
+			} else {
+				recv_result = recv(socket_id,message,MESSAGE_SIZE, MSG_WAITALL);
+				if (recv_result == -1) {
+					perror("recv");
+				} else {
+					printf("response : %s\n", message);
+				} 
+			}
+		}		
+		close(socket_id);
+	}
+	
 	return EXIT_SUCCESS;
 }

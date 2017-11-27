@@ -18,6 +18,7 @@ int main(int argc, char** argv) {
 		printf("usage : %s <chemin du fichier>\n", argv[0]);
 		return EXIT_FAILURE;
 	}	
+	int setsockopt_result, bind_result, listen_result, send_result, recv_result;
 
 	struct sigaction sa;
 	sa.sa_handler = &sigchild_handler;
@@ -34,28 +35,32 @@ int main(int argc, char** argv) {
 
 	int socket_id, yes, nid, pid;
 	char message[MESSAGE_SIZE];
+	memset(message, '\0', MESSAGE_SIZE);
 
-	socket_id=socket(AF_UNIX,SOCK_STREAM,0);
-	if (socket_id < 0) {
+	socket_id = socket(AF_UNIX,SOCK_STREAM,0);
+	if (socket_id == -1) {
 		perror("socket");
 	}
 
 	yes = 1;
-	if(setsockopt(socket_id,SOL_SOCKET,SO_REUSEADDR,&yes,sizeof(int)) < 0) {
+	setsockopt_result = setsockopt(socket_id,SOL_SOCKET,SO_REUSEADDR,&yes,sizeof(int));
+	if(setsockopt_result == -1) {
 		perror("setsockopt");
 	}
 
-	if (bind(socket_id, (struct sockaddr*)&local, sizeof(local)) < 0) {
+	bind_result = bind(socket_id, (struct sockaddr*)&local, sizeof(local));
+	if (bind_result == -1) {
 		perror("bind");
 	}
 
-	if (listen(socket_id, 0) < 0) {
+	listen_result = listen(socket_id, 0);
+	if (bind_result == -1) {
 		perror("listen");
 	}
 
 	while (1) {
 		nid=accept(socket_id, (struct sockaddr*)&local, &sockaddr_un_size);
-		if (nid < 0) {
+		if (nid == -1) {
 			perror("nid");
 		}
 
@@ -63,19 +68,24 @@ int main(int argc, char** argv) {
 		if (pid == -1) {
 			perror("fork");
 		}
+
 		if (pid == 0) {
 			close(socket_id);
-			if (recv(nid,message,MESSAGE_SIZE, MSG_WAITALL) < 0) {
+			recv_result = recv(nid,message,MESSAGE_SIZE, MSG_WAITALL);
+			if (recv_result == -1) {
 				perror("recv");
 			} else {
 				printf("%s\n",message);
-				if (send(nid,message,MESSAGE_SIZE, MSG_EOR) < 0) {
+				send_result = send(nid,message,MESSAGE_SIZE, MSG_EOR);
+				if (send_result == -1) {
 					perror("send");
 				}
 			}
 			exit(0);
 		}
-		close(nid);
+		if (pid > 0) {
+			close(nid);
+		}
 	}
 
 	return EXIT_SUCCESS;
