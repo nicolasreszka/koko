@@ -83,7 +83,7 @@ void main(int argc,char** argv)
 		{
 
 			/* On ferme le socket du père */
-			//close(sfd);
+			close(sfd);
 			while ( 1 )
 			{
 				/* On attend que le client envoie quelquechose */
@@ -119,7 +119,7 @@ void main(int argc,char** argv)
 				}
 				if ( nbyte < 6)
 				{
-					printf("Serveur (%d) : Je n'ai pas pu tout envoyer",getpid());
+					printf("Serveur (%d) : Je n'ai pas pu tout envoyer\n",getpid());
 					exit(-1);
 				}
 				printf("Serveur (%d) envoi : %s\n",getpid(), chaine);
@@ -130,7 +130,7 @@ void main(int argc,char** argv)
 		if ( x > 0 )
 		{
 			/* On ferme la copie du socket dans le pere ( inutile ) */
-			//close(nid);
+			close(nid);
 		}
 	}
 }

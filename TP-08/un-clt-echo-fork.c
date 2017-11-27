@@ -25,9 +25,11 @@ void main(int argc,char** argv)
 
 	serv.sun_family = AF_UNIX;
 
-	strncpy(serv.sun_path, SRV_SOCK_PATH , sizeof(local.sun_path) - 1);
+	strncpy(serv.sun_path, SRV_SOCK_PATH , sizeof(local.sun_path) );
 
 	connexion = connect(sfd,(struct sockaddr *) &serv, sizeof(struct sockaddr_un) );
+
+	socklen_t taille = sizeof(struct sockaddr_un);
 
 	if ( connexion == -1)
 	{
@@ -38,14 +40,18 @@ void main(int argc,char** argv)
 	while ( 1 )
 	{
 		chaine = "coucou";
-		nbyte = send(sfd,chaine,6,0);
+		/* Pour eviter une erreur, on utilise send to ( raison de l'erreur toujours indetermine )
+		nbyte = send(sfd,chaine,6,0);*/
+		nbyte = sendto(sfd,chaine,6,0,(struct sockaddr *) &serv,taille);
 		if ( nbyte < 1 )
 		{
 			perror("Erreur lors de l'envoi client ");
 			exit(-1);
 		}
 		printf("Client envoi : %s\n",chaine);
-		nbyte = recv(sfd,chaine,6,0);
+		/* Pour eviter une erreur, on utilise recvfrom (raison de l'erreur toujours indetermine)
+		nbyte = recv(sfd,chaine,6,0); */
+		nbyte = recvfrom(sfd,chaine,6,0,(struct sockaddr *) &serv,&taille);
 		if ( nbyte == 0)
 		{
 			printf("Le serveur est mort\n");
