@@ -11,7 +11,7 @@
 
 void main(int argc,char** argv)
 {
-	int sfd,nbyte;
+	int sfd,nbyte,err,yes = 1;
 
 	int connexion;
 
@@ -40,18 +40,18 @@ void main(int argc,char** argv)
 	while ( 1 )
 	{
 		chaine = "coucou";
-		/* Pour eviter une erreur, on utilise send to ( raison de l'erreur toujours indetermine )
-		nbyte = send(sfd,chaine,6,0);*/
-		nbyte = sendto(sfd,chaine,6,0,(struct sockaddr *) &serv,taille);
+		/* Pour eviter une erreur, on utilise send to ( raison de l'erreur toujours indetermine ) */
+		nbyte = send(sfd,chaine,6,0);
+		/* nbyte = sendto(sfd,chaine,6,0,(struct sockaddr *) &serv,taille); */
 		if ( nbyte < 1 )
 		{
 			perror("Erreur lors de l'envoi client ");
 			exit(-1);
 		}
 		printf("Client envoi : %s\n",chaine);
-		/* Pour eviter une erreur, on utilise recvfrom (raison de l'erreur toujours indetermine)
-		nbyte = recv(sfd,chaine,6,0); */
-		nbyte = recvfrom(sfd,chaine,6,0,(struct sockaddr *) &serv,&taille);
+		/* Pour eviter une erreur, on utilise recvfrom (raison de l'erreur toujours indetermine) */
+		nbyte = recv(sfd,chaine,6,0); 
+		/* nbyte = recvfrom(sfd,chaine,6,0,(struct sockaddr *) &serv,&taille); */
 		if ( nbyte == 0)
 		{
 			printf("Le serveur est mort\n");

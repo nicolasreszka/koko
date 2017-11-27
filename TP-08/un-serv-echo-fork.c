@@ -19,12 +19,20 @@ void main(int argc,char** argv)
 	int addrlen; /* Taille de la structure */
 	struct sockaddr_un local; /* Structure de l'addresse du serveur (locale) */
 	char* chaine = malloc(sizeof(char)*6); /* Buffer de reception et d'envoi */
+	int yes = 1; /* Valeur a donner en argument a setsockopt */
 
 	/* Création du socket */
 	sfd = socket(AF_UNIX,SOCK_STREAM,0);
 	if ( sfd == -1 )
 	{
 		perror("Erreur lors de la creation du socket client ");
+		exit(-1);
+	}
+
+	err = setsockopt(sfd,SOL_SOCKET,SO_REUSEADDR,&yes,sizeof(int));
+	if ( err == -1)
+	{
+		perror("Erreur lors de setsocketopt serveur");
 		exit(-1);
 	}
 
