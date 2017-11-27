@@ -1,0 +1,53 @@
+execve("./three-threads", ["./three-threads", "100", "100", "100"], 0x7ffc254feb58 /* 35 vars */) = 0
+brk(NULL)                               = 0x555693169000
+access("/etc/ld.so.preload", R_OK)      = -1 ENOENT (No such file or directory)
+open("/etc/ld.so.cache", O_RDONLY|O_CLOEXEC) = 3
+fstat(3, {st_mode=S_IFREG|0644, st_size=199874, ...}) = 0
+mmap(NULL, 199874, PROT_READ, MAP_PRIVATE, 3, 0) = 0x7f1b0d0c0000
+close(3)                                = 0
+open("/usr/lib/libpthread.so.0", O_RDONLY|O_CLOEXEC) = 3
+read(3, "\177ELF\2\1\1\0\0\0\0\0\0\0\0\0\3\0>\0\1\0\0\0\300\\\0\0\0\0\0\0"..., 832) = 832
+fstat(3, {st_mode=S_IFREG|0755, st_size=146440, ...}) = 0
+mmap(NULL, 8192, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_ANONYMOUS, -1, 0) = 0x7f1b0d0be000
+mmap(NULL, 2216400, PROT_READ|PROT_EXEC, MAP_PRIVATE|MAP_DENYWRITE, 3, 0) = 0x7f1b0ccb0000
+mprotect(0x7f1b0ccc9000, 2093056, PROT_NONE) = 0
+mmap(0x7f1b0cec8000, 8192, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0x18000) = 0x7f1b0cec8000
+mmap(0x7f1b0ceca000, 12752, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_FIXED|MAP_ANONYMOUS, -1, 0) = 0x7f1b0ceca000
+close(3)                                = 0
+open("/usr/lib/libc.so.6", O_RDONLY|O_CLOEXEC) = 3
+read(3, "\177ELF\2\1\1\3\0\0\0\0\0\0\0\0\3\0>\0\1\0\0\0\340\5\2\0\0\0\0\0"..., 832) = 832
+fstat(3, {st_mode=S_IFREG|0755, st_size=1985472, ...}) = 0
+mmap(NULL, 3823824, PROT_READ|PROT_EXEC, MAP_PRIVATE|MAP_DENYWRITE, 3, 0) = 0x7f1b0c90a000
+mprotect(0x7f1b0caa7000, 2093056, PROT_NONE) = 0
+mmap(0x7f1b0cca6000, 24576, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0x19c000) = 0x7f1b0cca6000
+mmap(0x7f1b0ccac000, 14544, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_FIXED|MAP_ANONYMOUS, -1, 0) = 0x7f1b0ccac000
+close(3)                                = 0
+mmap(NULL, 12288, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_ANONYMOUS, -1, 0) = 0x7f1b0d0bb000
+arch_prctl(ARCH_SET_FS, 0x7f1b0d0bb700) = 0
+mprotect(0x7f1b0cca6000, 16384, PROT_READ) = 0
+mprotect(0x7f1b0cec8000, 4096, PROT_READ) = 0
+mprotect(0x555691775000, 4096, PROT_READ) = 0
+mprotect(0x7f1b0d0f1000, 4096, PROT_READ) = 0
+munmap(0x7f1b0d0c0000, 199874)          = 0
+set_tid_address(0x7f1b0d0bb9d0)         = 19021
+set_robust_list(0x7f1b0d0bb9e0, 24)     = 0
+rt_sigaction(SIGRTMIN, {sa_handler=0x7f1b0ccb5740, sa_mask=[], sa_flags=SA_RESTORER|SA_SIGINFO, sa_restorer=0x7f1b0ccc17e0}, NULL, 8) = 0
+rt_sigaction(SIGRT_1, {sa_handler=0x7f1b0ccb57e0, sa_mask=[], sa_flags=SA_RESTORER|SA_RESTART|SA_SIGINFO, sa_restorer=0x7f1b0ccc17e0}, NULL, 8) = 0
+rt_sigprocmask(SIG_UNBLOCK, [RTMIN RT_1], NULL, 8) = 0
+prlimit64(0, RLIMIT_STACK, NULL, {rlim_cur=8192*1024, rlim_max=RLIM64_INFINITY}) = 0
+mmap(NULL, 8392704, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_ANONYMOUS|MAP_STACK, -1, 0) = 0x7f1b0c109000
+brk(NULL)                               = 0x555693169000
+brk(0x55569318a000)                     = 0x55569318a000
+mprotect(0x7f1b0c109000, 4096, PROT_NONE) = 0
+clone(child_stack=0x7f1b0c908ff0, flags=CLONE_VM|CLONE_FS|CLONE_FILES|CLONE_SIGHAND|CLONE_THREAD|CLONE_SYSVSEM|CLONE_SETTLS|CLONE_PARENT_SETTID|CLONE_CHILD_CLEARTID, parent_tidptr=0x7f1b0c9099d0, tls=0x7f1b0c909700, child_tidptr=0x7f1b0c9099d0) = 19022
+fstat(1, {st_mode=S_IFCHR|0620, st_rdev=makedev(136, 0), ...}) = 0
+futex(0x7f1b0ccac6e0, FUTEX_WAKE_PRIVATE, 1) = 1
+mmap(NULL, 8392704, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_ANONYMOUS|MAP_STACK, -1, 0) = 0x7f1b0b908000
+mprotect(0x7f1b0b908000, 4096, PROT_NONE) = 0
+clone(child_stack=0x7f1b0c107ff0, flags=CLONE_VM|CLONE_FS|CLONE_FILES|CLONE_SIGHAND|CLONE_THREAD|CLONE_SYSVSEM|CLONE_SETTLS|CLONE_PARENT_SETTID|CLONE_CHILD_CLEARTID, parent_tidptr=0x7f1b0c1089d0, tls=0x7f1b0c108700, child_tidptr=0x7f1b0c1089d0) = 19023
+mmap(NULL, 8392704, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_ANONYMOUS|MAP_STACK, -1, 0) = 0x7f1b0b107000
+mprotect(0x7f1b0b107000, 4096, PROT_NONE) = 0
+clone(child_stack=0x7f1b0b906ff0, flags=CLONE_VM|CLONE_FS|CLONE_FILES|CLONE_SIGHAND|CLONE_THREAD|CLONE_SYSVSEM|CLONE_SETTLS|CLONE_PARENT_SETTID|CLONE_CHILD_CLEARTID, parent_tidptr=0x7f1b0b9079d0, tls=0x7f1b0b907700, child_tidptr=0x7f1b0b9079d0) = 19024
+write(1, "ORDRE", 5)                    = 5
+exit_group(0)                           = ?
++++ exited with 0 +++
