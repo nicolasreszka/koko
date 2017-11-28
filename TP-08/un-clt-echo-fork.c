@@ -39,7 +39,7 @@ void main(int argc,char** argv)
 
 	while ( 1 )
 	{
-		chaine = "coucou";
+		strncpy(chaine,"coucou",6);
 		/* Pour eviter une erreur, on utilise send to ( raison de l'erreur toujours indetermine ) */
 		nbyte = send(sfd,chaine,6,0);
 		/* nbyte = sendto(sfd,chaine,6,0,(struct sockaddr *) &serv,taille); */
