@@ -32,12 +32,12 @@ int main(int argc, char** argv) {
 	 * size_t ftok(const char *pathname, int proj_id); 
 	 *
 	 * Cette fonction crée la clé l'aide de la chaîne de charactères pathname 
-	 * et des 8bits de poids faibles de key_t
+	 * et des 8bits de poids faibles de proj_id
 	 *
 	 * Arguments : 
 	 * 	- pathname : le chemin vers le fichier
 	 *	- proj_id : l'identifiant du projet, c'est un int mais seuls 
-	 *    les 8bits de poids faibles sont utilisés donc on peut mettre un char 
+	 *	  les 8bits de poids faibles sont utilisés donc on peut mettre un char 
 	*/ 
 	key = ftok("/tmp",'a');
 
