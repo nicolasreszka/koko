@@ -3,14 +3,7 @@
 #include "unistd.h"
 #include "sys/types.h"
 
-/*	Dans ce programme : 
-		-P crée Pf1 et Pf2 puis execute une boucle infinie -> O
-		-Pf1 crée Pf1f1 puis execute une boucle infinie -> O
-		-Un pipe est établi entre Pf1f1 et Pf2
-		-Pf1 et Pf2 écrivent toutes les 3 sec dans le pipe et affichent ce qu'ils écrivent
-		-Pf1f1 lit chaques secondes dans le pipe et affiche ce qu'il lit
-*/
-
+/* Ce programme est un exemple d'interblocage avec un pipe */
 
 int main(int argc, char** argv) {
 
@@ -51,34 +44,28 @@ int main(int argc, char** argv) {
 		/* Code exécuté par Pf1f1 */ 
 		if (pidPf1f1 == 0) {
 
-			/* On ferme l'entrée du côté lecteur */
-			close(pp[1]);
-
 			while (1) {
 				/* Lecture du message dans le pipe */
 				read(pp[0], &message, 4);
 				printf("\tPf1f1 (%d): recieved %d\n", getpid(), message);
+
+				/* On veut envoyer le pid de Pf1f1 à Pf2 */
+				message = getpid();
+
+				/* Ecriture du message dans le pipe */
+				write(pp[1],&message,4);
+				printf("\tPf1f1 (%d): sent %d\n", getpid(), message);
+
 				sleep(1);
 			}
 		}
 
 		/* Code exécuté par Pf1 */ 
 		if (pidPf1f1 > 0) {
-
-			/* On ferme la sortie du côté écrivain */
-			close(pp[0]);	
-
-			/* On veut envoyer le pid de l'écrivain au lecteur */
-			message = getpid();
-
-			while (1) {
-				message++;
-
-				/* Ecriture du message dans le pipe */
-				write(pp[1],&message,4);
-				printf("Pf1 (%d): sent %d\n", getpid(), message);
-				sleep(3);
-			}
+			/* Fermeture du tube car Pf1 ne s'en sert pas */ 
+			close(pp[0]);
+			close(pp[1]);
+			while (1);
 		}
 	}
 
@@ -97,18 +84,18 @@ int main(int argc, char** argv) {
 		/* Code exécuté par Pf2 */ 
 		if (pidPf2 == 0) {
 
-			/* On ferme la sortie du côté écrivain */
-			close(pp[0]);	
-
-			/* On veut envoyer le pid de l'écrivain au lecteur */
-			message = getpid();
-
 			while (1) {
-				message++;
+				/* Lecture du message dans le pipe */
+				read(pp[0], &message, 4);
+				printf("Pf2 (%d): recieved %d\n", getpid(), message);
+
+				/* On veut envoyer le pid de Pf2 à Pf1f1 */
+				message = getpid();
 
 				/* Ecriture du message dans le pipe */
 				write(pp[1],&message,4);
 				printf("Pf2 (%d): sent %d\n", getpid(), message);
+
 				sleep(3);
 			}
 		}
@@ -122,8 +109,3 @@ int main(int argc, char** argv) {
 		}
 	}
 }
-
-/*	On observe que Pf1 et Pf2 écrivent simultanément dans le tube et que 
-	Pf1f1 lit ce qui lui à été expédié par un processus, puis il lit ce qui 
-	lui à été expédié par l'autre processus une seconde après.
-*/

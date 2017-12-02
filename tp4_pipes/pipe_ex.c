@@ -74,7 +74,7 @@ int main(int argc, char** argv) {
 			close(pp[1]);
 
 			while (1) {
-				/* Ecriture du message dans le pipe */
+				/* Lecture du message dans le pipe */
 				read(pp[0], &message, 4);
 				printf("\tPf1f1 (%d): recieved %d\n", getpid(), message);
 				sleep(1);
