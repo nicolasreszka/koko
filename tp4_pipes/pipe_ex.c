@@ -25,7 +25,7 @@
 		-Pf2 écrit toutes les 3 sec son PID dans le pipe et affiche ce qu'il écrit
 		-Pf1f1 lit chaques secondes dans le pipe et affiche ce qu'il lit
 
-	Un "pipe" (tube) sert à faire communiquer plusieurs processus entre eux,
+	Un "pipe" (tube) sert à faire communiquer deux processus entre eux,
 	l'un écrit des informations dans l'entrée du tube, l'autre lit les 
 	information à la sortie du tube.
 */
@@ -131,7 +131,7 @@ int main(int argc, char** argv) {
 	}
 }
 
-/*	Oservations :
+/*	Observations :
 
 	Lorsque l'on envoie SIGSTOP à Pf2, on observe que Pf1f1 et Pf2 s'arrêtent
 	Lorsque l'on envoie ensuite SIGCONT à Pf2, on observe que Pf1f1 et Pf2 reprennent
