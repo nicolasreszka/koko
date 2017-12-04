@@ -10,31 +10,45 @@
 #include "sys/syscall.h"
 
 #define MESSAGE_SIZE 109
+#define MAX_CLIENTS 16
+
 
 char message[MESSAGE_SIZE];
 
-void* client_routine(void *arg_nid) {
-	int nid, recv_result, send_result;
+typedef struct client_thread_structure {
+    pthread_t thread;
+    int is_free;
+} client_thread;
+
+typedef struct client_thread_args_structure {
+    int thread_number;
+    int* nid;
+} client_thread_args;
+
+client_thread client_threads[MAX_CLIENTS];
+
+void* client_routine(void *args) {
+	client_thread_args* args_casted;
+	int thread_number, nid, recv_result, send_result;
    	
-   	nid = *(int*) arg_nid; 
-   	recv_result = recv(nid,message,MESSAGE_SIZE, MSG_WAITALL);
+	args_casted = (client_thread_args*) args;
+   	nid = *args_casted->nid;
+   	thread_number = args_casted->thread_number;
+
+   	recv_result = recv(*args_casted->nid,message,MESSAGE_SIZE, MSG_WAITALL);
 	
 	if (recv_result == -1) {
 		perror("recv");
 	} else {
 		printf("%s\n",message);
-		send_result = send(nid,message,MESSAGE_SIZE, MSG_EOR);
+		send_result = send(*args_casted->nid,message,MESSAGE_SIZE, MSG_EOR);
 		if (send_result == -1) {
 			perror("send");
 		}
 	}
 
+	client_threads[thread_number].is_free = 1;
 	pthread_exit(NULL);
-}
-
-void create_thread(int *nid) {
-	pthread_t thread;
-	pthread_create(&thread, NULL, client_routine, (void*)nid); 
 }
 
 int main(int argc, char** argv) {
@@ -66,6 +80,7 @@ int main(int argc, char** argv) {
 		perror("setsockopt");
 	}
 
+	unlink(local.sun_path);
 	bind_result = bind(socket_id, (struct sockaddr*)&local, sizeof(local));
 	if (bind_result == -1) {
 		perror("bind");
@@ -76,14 +91,28 @@ int main(int argc, char** argv) {
 		perror("listen");
 	}
 
+	int i;
+	for (i = 0; i < MAX_CLIENTS; i++) {
+		client_threads[i].is_free = 1;
+	} 
+	
+	client_thread_args args;
 	while (1) {
 		nid=accept(socket_id, (struct sockaddr*)&local, &sockaddr_un_size);
 		if (nid == -1) {
 			perror("nid");
 		}
 
-		create_thread(&nid);
-
+		for (i = 0; i < MAX_CLIENTS; i++) {
+			if (client_threads[i].is_free) {
+				client_threads[i].is_free = 0;
+				args.nid = &nid;
+				args.thread_number = i;
+				pthread_create(&client_threads[i].thread, NULL, client_routine, (void*)&args); 
+				break;
+			}
+		} 
+		
 		close(nid);	
 	}
 
