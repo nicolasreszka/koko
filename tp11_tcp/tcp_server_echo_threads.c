@@ -26,7 +26,7 @@ void* 	client_routine(void *arg)
 		if (recv_result == -1) 
 		{
 			perror("recv");
-			pthread_exit(NULL);
+			break
 		} 
 		else if (recv_result == 0)
 		{
@@ -40,7 +40,7 @@ void* 	client_routine(void *arg)
 			if (send_result == -1) 
 			{
 				perror("send");
-				pthread_exit(NULL);
+				break;
 			}
 		}
 	}
@@ -49,14 +49,15 @@ void* 	client_routine(void *arg)
 }
 
 
-int 	main(int argc, char** argv) {
+int 	main(int argc, char** argv) 
+{
 	if (argc != 2) 
 	{
 		printf("Usage: %s <port>\n", argv[0]);
 		exit(EXIT_FAILURE);
 	}
 
-	struct sockaddr_in	tcp_socket_address;
+	struct sockaddr_in 	tcp_socket_address;
 	socklen_t 			sockaddr_in_size = sizeof(struct sockaddr_in);
 	int 				tcp_socket_descriptor, nid;
 	int 				bind_result, listen_result;

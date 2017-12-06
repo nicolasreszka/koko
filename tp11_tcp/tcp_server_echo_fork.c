@@ -11,11 +11,13 @@
 #define MAX_CLIENTS 20
 #define MESSAGE_SIZE 109
 
-void 	sigchild_handler(int signal) {
+void 	sigchild_handler(int signal) 
+{
 	while(waitpid(-1, NULL, WNOHANG) > 0);
 }
 
-int 	main(int argc, char** argv) {
+int 	main(int argc, char** argv) 
+{
 	if (argc != 2) 
 	{
 		printf("Usage: %s <port>\n", argv[0]);
@@ -23,7 +25,7 @@ int 	main(int argc, char** argv) {
 	}
 
 	struct sigaction 	sa;
-	struct sockaddr_in	tcp_socket_address;
+	struct sockaddr_in 	tcp_socket_address;
 	socklen_t 			sockaddr_in_size = sizeof(struct sockaddr_in);
 	int 				tcp_socket_descriptor, nid, pid;
 	int 				bind_result, listen_result, send_result, recv_result;
