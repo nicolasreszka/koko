@@ -13,9 +13,10 @@ int		main(int argc, char** argv)
 	if (argc != 3) 
 	{
 		printf("Usage: %s <addresse v4> <port>\n", argv[0]);
+		exit(EXIT_FAILURE);
 	}
 
-	struct sockaddr_in	tcp_socket_address;
+	struct sockaddr_in 	tcp_socket_address;
 	socklen_t 			sockaddr_in_size = sizeof(struct sockaddr_in);
 	int 				tcp_socket_descriptor, read_result, send_result, recv_result;
 	int 				yes = 1;
