@@ -12,6 +12,7 @@ int main(int argc, char** argv){
   int length;
   socklen_t addr_size;
   char* buf;
+  char* answr;
 
   if(argc < 3){
     printf("Usage : %s <file name> <IPv4 addr>", argv[0]);
@@ -24,7 +25,7 @@ int main(int argc, char** argv){
   memset(&local, '\0', sizeof(struct sockaddr_in));
   local.sin_family = AF_INET;
   local.sin_port = htons((unsigned short) strtol(argv[2], NULL, 0));
-  local.sin_addr.s_addr = inet_addr(argv[2]);
+  local.sin_addr.s_addr = INADDR_ANY;
 
   /* Init du socket */
   
@@ -46,7 +47,6 @@ int main(int argc, char** argv){
   }
 
   /* Ecoute du socket */
-
   if(listen(id, 20) == -1){
     perror("Problème avec listen");
     return EXIT_FAILURE;
@@ -54,7 +54,7 @@ int main(int argc, char** argv){
 
   /* Accept / boucle */
   
-  buf = malloc(50); /* Nombre choisi arbitrairement */
+  buf = (char*) malloc(sizeof(char) * 50); /* Nombre choisi arbitrairement */
   memset(buf, '\0', 50);
 
   while(buf != "end"){
@@ -71,8 +71,6 @@ int main(int argc, char** argv){
     if(pid == -1){
       perror("Problème avec fork");
       return EXIT_FAILURE;
-    } else if(pid > 0){
-      wait(NULL);
     } else {
       close(id);
 
@@ -104,11 +102,15 @@ int main(int argc, char** argv){
             (struct sockaddr*) &local, sizeof(local));
       }
     }
+
+    if(pid > 0){
+      close(nid);
+    }
   }
 
   /* Close du socket */
   
-  close(nid);
+  close(id);
 
   return EXIT_SUCCESS;
 }
