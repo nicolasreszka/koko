@@ -101,6 +101,8 @@ int main(int argc, char** argv){
         sendto(nid, buf, 50, 0, 
             (struct sockaddr*) &local, sizeof(local));
       }
+      close(nid);
+      return EXIT_SUCCESS;
     }
 
     if(pid > 0){
