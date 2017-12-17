@@ -32,6 +32,7 @@ void runclttcp(char* addresse,char* port)
 	int sfd; /* Id du socket */
 	struct sockaddr_in serv; /* Structure représentant l'addresse */
 	int addrlen; /* Taille de la structure représantant l'addresse */
+	int s; /* Variable du traitement d'erreur de inet_pton */
 
 	addrlen = sizeof(serv);  /* On place la taille de la structure dans addrlen, nécessaire pour certaine fonction plus tard */
 
