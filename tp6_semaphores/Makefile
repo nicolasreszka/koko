@@ -16,7 +16,7 @@ exercice_1_a :
 	./print_word_letter_by_letter first 100 & ./print_word_letter_by_letter second 20 & ./print_word_letter_by_letter third 200
 
 exercice_1_c :
-	./print_word_letter_by_letter_semaphores first 100 1 & ./print_word_letter_by_letter_semaphores second 20 2 & ./print_word_letter_by_letter_semaphores third 200 3
+	./print_word_letter_by_letter_semaphores first 100 1 2 & ./print_word_letter_by_letter_semaphores second 20 2 3 & ./print_word_letter_by_letter_semaphores third 200 3 1
 
 clean:
 	rm *.o

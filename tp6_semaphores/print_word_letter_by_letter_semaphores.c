@@ -39,9 +39,9 @@ int 	print_word_letter_by_letter(char* word, int delay)
 
 int 	main(int argc, char** argv) {
 	
-	if (argc != 4) 
+	if (argc != 5) 
 	{
-		printf("Usage : %s <mot a afficher> <délai d'affichage en ms> <numéro du programme>\n", argv[0]);
+		printf("Usage : %s <mot a afficher> <délai d'affichage en ms> <numéro de clé 1> <numéro de clé 2>\n", argv[0]);
 		exit(EXIT_FAILURE);
 	}
 
@@ -49,7 +49,7 @@ int 	main(int argc, char** argv) {
 	struct sembuf	sem_out = {0, 1, 0};;
 	key_t			key_in, key_out;
 	int				semid_in, semid_out; 
-	int 			delay, program_number, print_success;
+	int 			delay, print_success;
 
 	delay = atoi(argv[2]);
 	if (delay > 1000) 
@@ -58,18 +58,10 @@ int 	main(int argc, char** argv) {
 		exit(EXIT_FAILURE);
 	}
 
-	program_number = atoi(argv[3]);
-	if (program_number > 9) 
-	{
-		printf("le numéro de programme ne doit pas dépasser 9\n");
-		exit(EXIT_FAILURE);
-	}
-
 	key_in = ftok("/tmp",argv[3][0]);
-	key_out = ftok("/tmp",argv[3][0]+'\n');
-	
-	printf("num = %s = %c\n", argv[3],argv[3][0]);
-	printf("num = %s = %c\n", argv[3],argv[3][0]+'\n');
+	key_out = ftok("/tmp",argv[4][0]);
+
+	printf("%s %s = %c %c\n",argv[3],argv[4],argv[3][0],argv[4][0] );
 
 	if (key_in == -1 || key_out == -1)
 	{
@@ -88,14 +80,12 @@ int 	main(int argc, char** argv) {
 
 	while (1)
 	{
-		printf("entering while\n");
 		if (semop(semid_in, &sem_in, 1) == -1)
 		{
 			perror("semop");
 			exit(errno);
 		}
 
-		printf("entering print\n");
 		print_success = print_word_letter_by_letter(argv[1],delay);
 
 		if (!print_success)
