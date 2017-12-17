@@ -32,7 +32,8 @@ int 	print_word_letter_by_letter(char* word, int delay)
 	return success;
 }
 
-int 	main(int argc, char** argv) {
+int 	main(int argc, char** argv) 
+{
 	
 	if (argc != 3) 
 	{
@@ -60,7 +61,3 @@ int 	main(int argc, char** argv) {
 
 	exit(EXIT_SUCCESS);
 }
-
-/* 	Lorsque l'on lance le programme trois fois avec trois différents mots,
-	on observe que les lettres sont mélangées
-*/

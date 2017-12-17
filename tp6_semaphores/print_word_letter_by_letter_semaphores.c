@@ -37,7 +37,8 @@ int 	print_word_letter_by_letter(char* word, int delay)
 	return success;
 }
 
-int 	main(int argc, char** argv) {
+int 	main(int argc, char** argv) 
+{
 	
 	if (argc != 5) 
 	{
