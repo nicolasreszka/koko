@@ -1,22 +1,22 @@
-all : first second third clean
+all : print_word_letter_by_letter print_word_letter_by_letter_semaphores clean
 
-first.o : first.c
-	gcc -c first.c
+print_word_letter_by_letter.o : print_word_letter_by_letter.c
+	gcc -c print_word_letter_by_letter.c
 
-first : first.o
-	gcc -o first first.o
+print_word_letter_by_letter : print_word_letter_by_letter.o
+	gcc -o print_word_letter_by_letter print_word_letter_by_letter.o
 
-second.o : second.c
-	gcc -c second.c
+print_word_letter_by_letter_semaphores.o : print_word_letter_by_letter_semaphores.c
+	gcc -g -c print_word_letter_by_letter_semaphores.c
 
-second : second.o
-	gcc -o second second.o
+print_word_letter_by_letter_semaphores : print_word_letter_by_letter_semaphores.o
+	gcc -g -o print_word_letter_by_letter_semaphores print_word_letter_by_letter_semaphores.o
 
-third.o : third.c
-	gcc -c third.c
+exercice_1_a :
+	./print_word_letter_by_letter first 100 & ./print_word_letter_by_letter second 20 & ./print_word_letter_by_letter third 200
 
-third : third.o
-	gcc -o third third.o
+exercice_1_c :
+	./print_word_letter_by_letter_semaphores first 100 1 & ./print_word_letter_by_letter_semaphores second 20 2 & ./print_word_letter_by_letter_semaphores third 200 3
 
 clean:
 	rm *.o
