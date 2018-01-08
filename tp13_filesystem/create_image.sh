@@ -18,3 +18,6 @@ dumpe2fs /tmp/image.ext3 > 2m-img-parms.txt
 #	-Inodes per group
 #	-Inode blocks per group
 # viennent du superblock  
+
+# monter l'image
+mount /tmp/image.ext3 
