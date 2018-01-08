@@ -1,5 +1,7 @@
 2)	(a) quels blocs appartiennent au journal ?
 		
+		d'après 2m-img-parms.txt, le inode du journal est l'inode 8
+
 		debugfs : blocks <8>
 
 			cette commande nous donne les blocs 159 à 1187
