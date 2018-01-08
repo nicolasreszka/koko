@@ -1,0 +1,48 @@
+2)	(a) quels blocs appartiennent au journal ?
+		
+		debugfs : blocks <8>
+
+			cette commande nous donne les blocs 159 à 1187
+
+	(b) qui (quel inode) utilise le bloc 5 ?
+
+		debugfs : icheck 5
+			Block	Inode number
+			5	7
+
+	(c) où (dans quel bloc) est l'inode 7 ?
+
+		debugfs : imap <7>
+			Inode 7 is part of block group 0
+					located at block 20, offset 0x0300
+
+	(d) le bloc 12, que contient-il ?
+
+		debugfs:  block_dump 12
+			0000  0000 0000 0000 0000 0000 0000 0000 0000  ................
+			*
+
+			que des zéros
+
+	(e) quelle est la structure de l'inode 7 ?
+
+		debugfs:  inode_dump <7>
+			0000  8081 0000 0030 0404 1e41 535a 1e41 535a  .....0...ASZ.ASZ
+			0020  1e41 535a 0000 0000 0000 0100 2000 0000  .ASZ........ ...
+			0040  0000 0000 0000 0000 0000 0000 0000 0000  ................
+			*
+			0120  0000 0000 0000 0000 0000 0000 9e00 0000  ................
+			0140  0000 0000 0000 0000 0000 0000 0000 0000  ................
+			*
+
+	(f) "inode bitmap", que contient-il ?
+
+		d'après 2m-img-parms.txt, le inode bitmap est l'inode 19
+
+		debugfs:  inode_dump <19>
+			0000  0000 0000 0000 0000 0000 0000 0000 0000  ................
+			*
+
+			que des zéros
+
+
