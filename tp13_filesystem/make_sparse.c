@@ -12,16 +12,16 @@ int 	main(int argc, char** argv)
 		exit(EXIT_FAILURE);
 	}
 
-	int 			file, i;
-	unsigned int 	hole_size;
-	char 			one, zero;
+	int 				file, i, write_error;
+	unsigned int		hole_size;
+	char 				one, zero;
 
-	one = 0x11;
-	zero = 0x00;
+	one 	= 0x11;
+	zero 	= 0x00;
 
 	hole_size = (unsigned int) strtoul(argv[2],NULL,0);
 
-	file = open(argv[1], O_CREAT|0666);
+	file = open(argv[1], O_CREAT|O_TRUNC|O_WRONLY|0640);
 
 	if (file == -1)
 	{
@@ -31,15 +31,32 @@ int 	main(int argc, char** argv)
 	
 	for (i = 0; i < hole_size; i++)
 	{
-		write(file,&one,1);
+		write_error = write(file,&one,1);
+		if (write_error == -1)
+		{
+			perror("write");
+			exit(errno);
+		}
+
 	}
 	for (i = 0; i < hole_size; i++)
 	{
-		write(file,&zero,1);
+		write_error = write(file,&zero,1);
+		if (write_error == -1)
+		{
+			perror("write");
+			exit(errno);
+		}
+
 	}
 	for (i = 0; i < hole_size; i++)
 	{
-		write(file,&one,1);
+		write_error = write(file,&one,1);
+		if (write_error == -1)
+		{
+			perror("write");
+			exit(errno);
+		}
 	}
 
 	exit(EXIT_SUCCESS);
