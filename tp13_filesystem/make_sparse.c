@@ -15,16 +15,16 @@ int 	main(int argc, char** argv)
 	int 				file, i, write_error;
 	unsigned int		hole_size;
 	char 				one, zero;
-
+	off_t 				lseek_error;
+	
 	one 	= 0x11;
-	zero 	= 0x00;
 
 	hole_size = (unsigned int) strtoul(argv[2],NULL,0);
 
 	file = open(argv[1], O_CREAT|O_TRUNC|O_WRONLY|0640);
 
 	if (file == -1)
-	{git 
+	{
 		perror("open");
 		exit(errno);
 	}
@@ -39,16 +39,15 @@ int 	main(int argc, char** argv)
 		}
 
 	}
-	for (i = 0; i < hole_size; i++)
-	{
-		write_error = write(file,&zero,1);
-		if (write_error == -1)
-		{
-			perror("write");
-			exit(errno);
-		}
+	
+	lseek_error = lseek(file, hole_size, SEEK_CUR);
 
+	if (lseek_error == -1)
+	{
+		perror("lseek");
+		exit(errno);
 	}
+
 	for (i = 0; i < hole_size; i++)
 	{
 		write_error = write(file,&one,1);
