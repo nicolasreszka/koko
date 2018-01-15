@@ -47,4 +47,9 @@
 
 			que des zéros
 
+3) Quel est le numéro d'inode qui correspond au répertoire /mnt/hd ?
+	
+	> ls -i /mnt/hd/
+		11 lost+found
 
+	L'inode 11
