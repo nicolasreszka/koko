@@ -24,7 +24,7 @@ int 	main(int argc, char** argv)
 	file = open(argv[1], O_CREAT|O_TRUNC|O_WRONLY|0640);
 
 	if (file == -1)
-	{
+	{git 
 		perror("open");
 		exit(errno);
 	}
@@ -58,6 +58,8 @@ int 	main(int argc, char** argv)
 			exit(errno);
 		}
 	}
+
+	close(file);
 
 	exit(EXIT_SUCCESS);
 }
