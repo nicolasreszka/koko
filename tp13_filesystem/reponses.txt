@@ -53,3 +53,45 @@
 		11 lost+found
 
 	L'inode 11
+
+
+8) 	(a) comment avez vous détecté le problème ?
+		
+ 		avec la commande suivante : 
+
+		> fsck -n /tmp/0image.ext3 
+			fsck from util-linux 2.29.2
+			e2fsck 1.43.4 (31-Jan-2017)
+			/tmp/0image.ext3 has gone 2888 days without being checked, check forced.
+			Pass 1: Checking inodes, blocks, and sizes
+			Pass 2: Checking directory structure
+			Pass 3: Checking directory connectivity
+			Pass 4: Checking reference counts
+			Unattached inode 20
+			Connect to /lost+found? no
+
+			Unattached inode 22
+			Connect to /lost+found? no
+
+			Inode 25 ref count is 1, should be 3.  Fix? no
+
+			Pass 5: Checking group summary information
+
+			/tmp/0image.ext3: ********** WARNING: Filesystem still has errors **********
+
+			/tmp/0image.ext3: 25/256 files (4.0% non-contiguous), 1109/2048 blocks
+
+	(b) quelles structures ont été endommageées ?
+
+		l'inode 20 et l'inode 22 sont détachées
+
+	(c) a quoi, plus précisément, consiste le dommage ?
+
+		
+
+	(d) quelles sont les conséquences de point de vue d'utilisateur ?
+
+
+
+	(e) est-il possible de réparer le système ? Comment ?
+
