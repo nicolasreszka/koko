@@ -87,11 +87,28 @@
 
 	(c) a quoi, plus précisément, consiste le dommage ?
 
-		
+		l'inode 25 référence 3 fichiers d'différents
 
 	(d) quelles sont les conséquences de point de vue d'utilisateur ?
 
-
+		2 fichiers sont manquants du point de vue de l'utilisateur
 
 	(e) est-il possible de réparer le système ? Comment ?
+
+		il est possible de réparer le système
+
+		l'inode 20 est détachée
+		il faut trouver à quel block appartient l'inode 20
+
+		debugfs:  imap <20>
+			Inode 20 is part of block group 0
+				located at block 14, offset 0x0180
+
+		on remarque que l'inode 20 est localisé dans le block 14 
+		en tapant	"block_dump 14"	on peut voir le contenu du fichier à l'offset 0x0180
+
+
+
+
+
 
