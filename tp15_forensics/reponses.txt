@@ -1,0 +1,34 @@
+1) Trouver les inodes perdues :
+	>ils -r 0image.ext3 
+		class|host|device|start_time
+		ils|salle235-05.arda||1516981940
+		st_ino|st_alloc|st_uid|st_gid|st_mtime|st_atime|st_ctime|st_crtime|st_mode|st_nlink|st_size
+		30|f|1000|100|1423447732|1423447393|1423447732|0|644|0|0
+
+	c'est l'inode 30
+
+2) Inspecter l'inode 30 pour voir à quel groupe de block il appartient :
+	
+	debugfs : imap <30>
+		Inode 30 is part of block group 0
+		located at block 23, offset 0x0280
+
+3)	Inspecter le journal
+	>jls 0image.ext3 | grep "Block 23"
+		4:	Unallocated FS Block 23
+		20:	Unallocated FS Block 23
+		27:	Unallocated FS Block 23
+		113:	Unallocated FS Block 23
+		122:	Unallocated FS Block 23
+		129:	Unallocated FS Block 23
+		138:	Unallocated FS Block 23
+
+
+ ----- A finir --------
+4) Copier les données depuis le journal :
+	>jcat 0image.ext3 8 20 | hexdump -C -v  > log_jcat_0image_ext3.txt
+
+5) Copier directement :
+	>dd if=0image.ext3 of=out.dat bs=1024 count=1 skip=23
+
+
