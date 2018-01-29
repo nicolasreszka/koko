@@ -1,0 +1,50 @@
+$strings --radix=d image.ext3 | grep ".jpg"
+ 680036 jadot_pinot.jpg
+ 696420 jadot_pinot.jpg
+23068772 jadot_pinot.jpg
+
+Then we use dumpe2fs to get full description of the image (and get the infos we need).
+
+
+$echo $((680036/2048))
+332
+Block num = 332 because 2048 is block size
+
+
+Just checking inode number to be sure it's a regular file :
+debugfs:  icheck 332
+Block	Inode number
+332	  8
+
+
+Let's dump the block :
+debugfs:  block_dump 332
+0000  0e00 0000 0c00 0102 2e00 0000 0112 0000  ................
+0020  0c00 0202 2e2e 0000 0f00 0000 1400 0901  ................
+0040  6964 6561 312e 7478 7400 0000 1000 0000  idea1.txt.......
+0060  3000 2801 466f 7267 696e 675f 4361 6e6f  0.(.Forging_Cano
+0100  6e5f 4f72 6967 696e 616c 5f44 6563 6973  n_Original_Decis
+0120  696f 6e5f 4461 7461 2e70 6466 1300 0000  ion_Data.pdf....
+0140  a407 0f01 6a61 646f 745f 7069 6e6f 742e  ....jadot_pinot.
+0160  6a70 6700 0000 0000 0000 0000 0000 0000  jpg.............
+0200  0000 0000 0000 0000 0000 0000 0000 0000  ................
+*
+
+We see that the begining of jadot_pinot.jpg entry is at 0x0120 : "1300 000" which corresponds to inode 19
+
+debugfs:  show_inode_info <19>
+Inode: 19   Type: regular    Mode:  0644   Flags: 0x0
+Generation: 2959905362    Version: 0x00000000
+User:  1000   Group:   100   Size: 21531
+File ACL: 0    Directory ACL: 0
+Links: 1   Blockcount: 44
+Fragment:  Address: 0    Number: 0    Size: 0
+ctime: 0x4f64e960 -- Sat Mar 17 19:43:28 2012
+atime: 0x4f64e960 -- Sat Mar 17 19:43:28 2012
+mtime: 0x4f64e960 -- Sat Mar 17 19:43:28 2012
+BLOCKS:
+(0-10):14689-14699
+TOTAL: 11
+
+
+We use "recoverBlocs.c" to recover the picture.

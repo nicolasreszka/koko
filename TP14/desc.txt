@@ -1,0 +1,66 @@
+dumpe2fs 1.43.4 (31-Jan-2017)
+Filesystem volume name:   <none>
+Last mounted on:          <not available>
+Filesystem UUID:          8c783af6-67a0-47e2-8d4d-58f9f9795c5a
+Filesystem magic number:  0xEF53
+Filesystem revision #:    1 (dynamic)
+Filesystem features:      has_journal ext_attr resize_inode dir_index filetype sparse_super
+Filesystem flags:         signed_directory_hash
+Default mount options:    (none)
+Filesystem state:         clean
+Errors behavior:          Continue
+Filesystem OS type:       Linux
+Inode count:              9216
+Block count:              18432
+Reserved block count:     921
+Free blocks:              16152
+Free inodes:              9191
+First block:              0
+Block size:               2048
+Fragment size:            2048
+Reserved GDT blocks:      17
+Blocks per group:         16384
+Fragments per group:      16384
+Inodes per group:         4608
+Inode blocks per group:   288
+Filesystem created:       Sat Mar 17 03:01:33 2012
+Last mount time:          Sat Mar 17 19:42:11 2012
+Last write time:          Sat Mar 17 19:44:07 2012
+Mount count:              2
+Maximum mount count:      31
+Last checked:             Sat Mar 17 03:01:33 2012
+Check interval:           15552000 (6 months)
+Next check after:         Thu Sep 13 03:01:33 2012
+Reserved blocks uid:      0 (user root)
+Reserved blocks gid:      0 (group root)
+First inode:              11
+Inode size:	          128
+Journal inode:            8
+Default directory hash:   half_md4
+Directory Hash Seed:      e9e5eb6c-ac32-4125-b0f7-93b8af973cc6
+Journal backup:           inode blocks
+Journal features:         (none)
+Journal size:             2054k
+Journal length:           1024
+Journal sequence:         0x0000001b
+Journal start:            0
+
+
+Group 0: (Blocks 0-16383)
+  Primary superblock at 0, Group descriptors at 1-1
+  Reserved GDT blocks at 2-18
+  Block bitmap at 19 (+19)
+  Inode bitmap at 20 (+20)
+  Inode table at 21-308 (+21)
+  14414 free blocks, 4588 free inodes, 5 directories
+  Free blocks: 1356-3071, 3119-6143, 6145-8191, 8193-9215, 9416-11263, 11265-14335, 14700-16383
+  Free inodes: 21-4608
+Group 1: (Blocks 16384-18431)
+  Backup superblock at 16384, Group descriptors at 16385-16385
+  Reserved GDT blocks at 16386-16402
+  Block bitmap at 16403 (+19)
+  Inode bitmap at 16404 (+20)
+  Inode table at 16405-16692 (+21)
+  1738 free blocks, 4603 free inodes, 2 directories
+  Free blocks: 16693-17407, 17409-18431
+  Free inodes: 4614-9216
