@@ -23,12 +23,32 @@
 		129:	Unallocated FS Block 23
 		138:	Unallocated FS Block 23
 
+4)	On copie l'inode 30 pour connaitre les propriétés du fichier supprimé
+	skip = 5 car (#inode)%(nombre d'inode par bloc) = 30%8 = 6-1 (car on commance à zéro) = 5 
+	>jcat 0image.ext3 8 20 | dd bs=128 skip=5 count=1 > log_jcat_inode23_0image_ext3.txt
 
- ----- A finir --------
-4) Copier les données depuis le journal :
-	>jcat 0image.ext3 8 20 | hexdump -C -v  > log_jcat_0image_ext3.txt
+			  on obtient la taille du fichier (little endian)
+			  |
+			  v
+	a481 e803 3b57 0400 6115 d854 6115 d854
+	6115 d854 0000 0000 6400 0100 3202 0000
+	0000 0000 0000 0000 9b06 0000 9c06 0000
+	9d06 0000 9e06 0000 9f06 0000 a006 0000
+	a106 0000 a206 0000 a306 0000 a406 0000
+	a506 0000 a606 0000 a706 0000 a807 0000
+	0000 0000 8596 cda3 0000 0000 0000 0000
+	0000 0000 0000 0000 0000 0000 0000 0000
 
-5) Copier directement :
+	taille = 0x0004573b
+
+5) 	On récupère la taille du fichier en décimal 
+	>printf "%d" 0x0004573b
+		284475
+
+	le fichier pèse 284475 octets
+
+--- à finir --
+)	Copier les données du fichier supprimer :
 	>dd if=0image.ext3 of=out.dat bs=1024 count=1 skip=23
 
 
