@@ -1,4 +1,4 @@
-Merci de mettre indentation = tab with 4 spaces pour éviter les problèmes d'affichage du fichier texte.
+Merci de mettre indentation : tab size = 4 pour éviter les problèmes d'affichage du fichier texte.
 
 1) Trouver les inodes perdues :
 	>ils -r 0image.ext3 
