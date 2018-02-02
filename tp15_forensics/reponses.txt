@@ -26,9 +26,23 @@
 4)	On copie l'inode 30 depuis le journal pour connaitre les propriétés du fichier supprimé
 
 	skip = 5 car (numéro de l'inode)%(nombre d'inode par bloc) 
-		= 30%8 
-		= 6-1 (car on part de zéro) 
-		= 5 
+	     = 30%8 
+	     = 6-1 (car on part de zéro) 
+	     = 5 
+
+	Autre méthode : 
+	debugfs:  imap <30>
+		Inode 30 is part of block group 0
+		located at block 23, offset 0x0280
+	                                ^
+	                                |
+
+	                                bloc offset (= 640 en décimal)
+
+	skip = (block offset)/(inode size)
+	     = 640 / 128
+	     = 5
+
 
 	>jcat 0image.ext3 8 20 | dd bs=128 skip=5 count=1 > log_jcat_inode23_0image_ext3.txt
 
