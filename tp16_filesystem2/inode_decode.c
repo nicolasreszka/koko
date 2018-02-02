@@ -33,7 +33,7 @@ int 	main(int argc, char const *argv[])
 
 	/* File mode */
 	read(inode_file, &short_buffer, 2);
-	printf("File mode : %d\n", short_buffer);
+	printf("File mode : 0%o\n", short_buffer);
 
 	/* User ID */
 	read(inode_file, &short_buffer, 2);
