@@ -45,19 +45,28 @@ int 	main(int argc, char const *argv[])
 
 	/* Access time */
 	read(inode_file, &int_buffer, 4);
-	printf("Access time : %d\n", int_buffer);
+	printf("Access time : %d seconds since 01/01/1970 \n", int_buffer);
 
 	/* Inode change time */
 	read(inode_file, &int_buffer, 4);
-	printf("Inode change time : %d\n", int_buffer);
+	printf("Inode change time : %d seconds since 01/01/1970 \n", int_buffer);
 
 	/* Modification time */
 	read(inode_file, &int_buffer, 4);
-	printf("Modification time : %d\n", int_buffer);
+	printf("Modification time : %d seconds since 01/01/1970 \n", int_buffer);
 
 	/* Deletion time */
 	read(inode_file, &int_buffer, 4);
-	printf("Deletion time : %d\n", int_buffer);
+	printf("Deletion time : %d ", int_buffer);
+
+	if (int_buffer == 0)
+	{
+		putchar('\n');
+	}
+	else
+	{
+		printf("seconds since 01/01/1970 \n", int_buffer);	
+	}
 
 	/* Group ID */
 	read(inode_file, &short_buffer, 2);
@@ -106,9 +115,6 @@ int 	main(int argc, char const *argv[])
 	{
 		printf("Triple indirect block : %d\n", int_buffer);
 	}
-
-	
-
 
 	close(inode_file);
 
