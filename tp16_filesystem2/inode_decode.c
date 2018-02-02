@@ -95,6 +95,21 @@ int 	main(int argc, char const *argv[])
 	read(inode_file, &int_buffer, 4);
 	printf("Double indirect block : %d\n", int_buffer);
 
+	/* Triple indirect block */
+	read(inode_file, &int_buffer, 4);
+
+	if (int_buffer == 0)
+	{
+		printf("No triple indirect blocks\n");
+	}
+	else
+	{
+		printf("Triple indirect block : %d\n", int_buffer);
+	}
+
+	
+
+
 	close(inode_file);
 
 	exit(EXIT_SUCCESS);
