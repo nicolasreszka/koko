@@ -15,18 +15,19 @@ void	encrypt(unsigned int key[4], int block[2])
 	for (i = 0; i < ENCRYPTION_DEPTH; i++)
 	{
 		block[0] += (key[0] + (block[1] << 4)) 
-		          ^ (key[1] + (block[1] >> 5)) 
-		          ^((delta *i)+block[1]);
+		          ^((delta *i)+block[1]) 
+		          ^ (key[1] + (block[1] >> 5));
 		
 		block[1] += (key[2] + (block[0] << 4))
-	              ^ (key[3] + (block[0] >> 5))
-	              ^((delta *i)+block[0]);
+	              ^((delta *i)+block[0])
+	              ^ (key[3] + (block[0] >> 5));
 	}
 }
 
 int 	main(int argc, char** argv)
 {
-	if (argc < 3)
+	if (argc < 2)
+	//if (argc < 3)
 	{
 		printf("usage : %s <file to encrypt> <128 bit key>\n", argv[0]);
 		exit(EXIT_FAILURE);
@@ -37,9 +38,16 @@ int 	main(int argc, char** argv)
 	int 			file_in, file_out;
 	ssize_t			read_result, write_result;
 	
-	key[0]  = strtoull(argv[2], NULL, 0);
+	// key[0]  = strtoull(argv[2], NULL, 0);
 
-	//printf("%x %x %x %x\n", key[0], key[1], key[2], key[3]);
+	// printf("%x %x %x %x\n", key[0], key[1], key[2], key[3]);
+
+	key[0] = 15;
+	key[1] = 1357;
+	key[2] = 7830;
+	key[3] = 7159;
+
+	printf("%d %d %d %d\n", key[0], key[1], key[2], key[3]);
 
 	file_in = open(argv[1], O_RDONLY, 0655);
 
@@ -49,7 +57,7 @@ int 	main(int argc, char** argv)
 		exit(errno);
 	}
 
-	file_out = open("out.dat", O_WRONLY|O_CREAT|O_TRUNC, 0655);
+	file_out = open("encrypt_out.dat", O_WRONLY|O_CREAT|O_TRUNC, 0655);
 
 	if (file_out == -1)
 	{
@@ -61,7 +69,7 @@ int 	main(int argc, char** argv)
 
 	while (read_result > 0) 
 	{
-		read_result = read(file_in, block, 2);
+		read_result = read(file_in, block, 8);
 
 		if (read_result == -1)
 		{
@@ -71,7 +79,7 @@ int 	main(int argc, char** argv)
 
 		encrypt(key,block);
 
-		write_result = write(file_out, block, 2);
+		write_result = write(file_out, block, 8);
 
 		if (write_result == -1)
 		{
