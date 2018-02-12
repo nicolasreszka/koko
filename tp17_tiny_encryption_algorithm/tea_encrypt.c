@@ -17,7 +17,6 @@ void	encrypt(unsigned int key[4], int block[2])
 	for (i = 0; i < ENCRYPTION_DEPTH; i++)
 	{
 		block[0] += (key[0] + (block[1] << 4)) 
-<<<<<<< HEAD
 		          ^ (d      +  block[1]) 
 		          ^ (key[1] + (block[1] >> 5));
 		
@@ -26,14 +25,6 @@ void	encrypt(unsigned int key[4], int block[2])
 		          ^ (key[3] + (block[0] >> 5));
 
 		d += delta;
-=======
-		          ^((delta *i)+block[1]) 
-		          ^ (key[1] + (block[1] >> 5));
-		
-		block[1] += (key[2] + (block[0] << 4))
-		          ^((delta *i)+block[0])
-		          ^ (key[3] + (block[0] >> 5));
->>>>>>> 423b2f46cb3b538547f212b152c64e9fcf7ecdfa
 	}
 }
 
