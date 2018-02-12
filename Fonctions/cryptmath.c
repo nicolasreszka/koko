@@ -168,7 +168,7 @@ void substDiadeOctet(unsigned char * octet, unsigned int substListe[4],int cycle
       buff |= buff4;
       *octet = buff;
     }
-  
+}
 
 void mOctet(unsigned char octet)
 {
@@ -185,3 +185,41 @@ void mOctet(unsigned char octet)
   putchar('\n');
 }
   
+unsigned int key_shuffle_tea(unsigned int key[4],unsigned int demi, unsigned int delta, char test)
+{
+  unsigned int top;
+  unsigned int mid;
+  unsigned int bot;
+  bot = demi >> 5;
+  top = demi << 4;
+  if(!test)
+  {
+    top+=key[0];
+    bot+=key[1];
+
+  }
+  else
+  {
+    top += key[2];
+    bot += key[3];
+  }
+  mid = demi + delta;
+  return top^mid^bot;
+}
+
+void tea_encrypt(unsigned int tour, unsigned int key[4], unsigned int bloc[2])
+{
+  unsigned int i;
+  unsigned int l = bloc[0];
+  unsigned int r = bloc[1];
+  unsigned int lpu;
+  unsigned int delta = 0x9e3779b9;
+  for ( i = 0 ; i < tour ; i++ )
+  {
+    l += key_shuffle_tea(key,r,delta,0);
+    r += key_shuffle_tea(key,l,delta,1);
+    delta += delta;
+  }
+  bloc[0] = l;
+  bloc[1] = r;
+}
