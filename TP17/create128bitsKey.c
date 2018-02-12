@@ -9,7 +9,7 @@
 
 int main(int argc, char const *argv[]) {
   u_int32_t key[4];
-  __uint128_t key_val = KEY_VALUE;
+  __uint128_t key_val = KEY_VALUE; //note that __int128 type requiers gcc version > 4.4
   *key = key_val;
   int key_file = open("key.dat", O_CREAT|O_TRUNC|O_WRONLY, 0666);
   if(key_file == -1){
