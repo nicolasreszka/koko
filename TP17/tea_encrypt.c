@@ -5,22 +5,25 @@
 #include <errno.h>
 #include <sys/stat.h>
 #include <fcntl.h>
-typedef unsigned uint128_t __attribute__ ((mode (TI)));
+#include <stdint.h>
 
-void encrypt (u_int32_t* v, u_int32_t* k) {
-  u_int32_t delta = 0x9e3779b9;
-  for (int i = 0; i < 32; i++) {
-    v[0] += (v[1] * delta * i) ^ ((v[1] << 4) + k[0]) ^ ((v[1] >> 5) + k[1]);
-    v[1] += (v[0] * delta * i) ^ ((v[0] << 4) + k[2]) ^ ((v[0] >> 5) + k[3]);
+#define BASE_DELTA 0x9e3779b9u
+#define KEY_VALUE_HIGH 0x7A24432646294A40 //64bits value
+#define KEY_VALUE_LOW 0x4E635266556A586E //64bits value
+
+#define TEA_ROUNDS 64
+
+void encrypt (uint32_t *restrict v, const uint32_t* restrict k) {
+  uint32_t delta = BASE_DELTA;
+  for (int i = 0; i < TEA_ROUNDS/2; i++) {
+    v[0] += (v[1] + delta) ^ ((v[1] << 4) + k[0]) ^ ((v[1] >> 5) + k[1]);
+    v[1] += (v[0] + delta) ^ ((v[0] << 4) + k[2]) ^ ((v[0] >> 5) + k[3]);
+    delta += BASE_DELTA;
   }
 }
 
-void getKeyFromString(u_int32_t key[4], const char file_key_path[]){
-  int fd_key = open(file_key_path, O_RDONLY, 0655); //RDONLY permissions are 0655
-  if(fd_key == -1){
-    perror("open");
-    exit(errno);
-  }
+void getKeyFromFile(const int fd_key, uint32_t key[4]){
+
   int nb_bytes_read = read(fd_key, key, sizeof(__int128_t));
   if(nb_bytes_read == -1){
     perror("read");
@@ -35,19 +38,22 @@ void getKeyFromString(u_int32_t key[4], const char file_key_path[]){
   return;
 }
 
-void encryptFile(const char file_to_encrypt_path[], u_int32_t key[4]){
+void encryptFile(const int fd, const uint32_t key[4]){
 
-  u_int32_t block[2];
+  uint32_t block[2];
 
   int nb_bytes_read = 0;
-  int fd_to_encrypt = open(file_to_encrypt_path, O_RDONLY, 0655); //RDONLY permissions are 0655
-  int fd_result_file = open("encrypted_file.dec", O_CREAT|O_TRUNC|O_WRONLY, 0666);
 
+  int fd_result_file = open("encrypted_file.dec", O_CREAT|O_TRUNC|O_WRONLY, 0666);
+  if(fd_result_file == -1){
+    perror("open");
+    exit(errno);
+  }
 
   while(1){
-    memset(block, 0x0, sizeof(u_int64_t));
+    memset(block, 0x0, sizeof(uint64_t));
 
-    nb_bytes_read = read(fd_to_encrypt, block, sizeof(u_int64_t));
+    nb_bytes_read = read(fd, block, sizeof(block));
     if(nb_bytes_read == -1){
       perror("read");
       exit(errno);
@@ -57,11 +63,13 @@ void encryptFile(const char file_to_encrypt_path[], u_int32_t key[4]){
     }
     encrypt(block, key);
 
-    if(write(fd_result_file, block, sizeof(u_int64_t)) ==-1){
+    if(write(fd_result_file, block, sizeof(block)) ==-1){
       perror("write");
       exit(errno);
     }
   }
+  close(fd);
+  close(fd_result_file);
 }
 
 
@@ -72,14 +80,27 @@ int main(int argc, char const *argv[]) {
   		exit(EXIT_FAILURE);
   }
 
-  u_int32_t key[4];
+  uint32_t key[4];
   u_int32_t block[2];
-  memset(key, 0x0, sizeof(u_int32_t) * 4);
-  memset(block, 0x0, sizeof(u_int32_t) * 2);
+  memset(key, 0x0, sizeof(uint32_t) * 4);
+  memset(block, 0x0, sizeof(uint32_t) * 2);
 
-  getKeyFromString(key, argv[2]);
+  //Note that __uint128_t requiers gcc version > 4.4
+  __uint128_t key_val = ((__uint128_t) KEY_VALUE_HIGH << 64 | (__uint128_t) KEY_VALUE_LOW);
+  key[0] = key_val >> 0;
+  key[1] = key_val >> 32;
+  key[2] = key_val >> 64;
+  key[3] = key_val >> 96;
 
-  encryptFile(argv[1], key);
+  int fd = open(argv[2], O_RDONLY, 0655); //RDONLY permissions are 0655
+  if(fd == -1){
+    perror("open");
+    exit(errno);
+  }
+
+  getKeyFromFile(fd, key);
+
+  encryptFile(fd, key);
 
   return 0;
 }
