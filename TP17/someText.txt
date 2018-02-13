@@ -1,2 +1,0 @@
-Ceci est un texte lambda qui a juste pour vocation d'être encrypté
-selon la méthode tinydecrypt du futur.
