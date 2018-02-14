@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 void rotOctetD(unsigned char * octet,int cycle)
 {
@@ -185,6 +186,13 @@ void mOctet(unsigned char octet)
   putchar('\n');
 }
   
+
+
+
+/* 
+  Fonction qui s'occupe de la gestion unitaire d'un demi bloc lors d'un tour 
+  Utile dans tea_encrypt 
+*/
 unsigned int key_shuffle_tea(unsigned int key[4],unsigned int demi, unsigned int delta, char test)
 {
   unsigned int top;
@@ -207,7 +215,12 @@ unsigned int key_shuffle_tea(unsigned int key[4],unsigned int demi, unsigned int
   return top^mid^bot;
 }
 
-void tea_encrypt(unsigned int tour, unsigned int key[4], unsigned int bloc[2])
+/*
+  Fonction tea_encrypt
+  On lui donne dans un tableau 1 bloc divisé en 2 sous blocs et la clef
+*/
+
+void tea_encrypt_bloc(unsigned int tour, unsigned int key[4], unsigned int bloc[2])
 {
   unsigned int i;
   unsigned int l = bloc[0];
@@ -222,4 +235,90 @@ void tea_encrypt(unsigned int tour, unsigned int key[4], unsigned int bloc[2])
   }
   bloc[0] = l;
   bloc[1] = r;
+}
+
+ void tea_decrypt_bloc(unsigned int tour, unsigned int key[4], unsigned int bloc[2])
+ {
+  unsigned i;
+  unsigned l = bloc[0];
+  unsigned int r = bloc[1];
+  unsigned int lpu;
+  unsigned int delta = 0x9e3779b9;
+  for ( i = 0 ; i < tour ; i++ )
+  {
+    l -= key_shuffle_tea(key,r,delta,0);
+    r -= key_shuffle_tea(key,l,delta,1);
+    delta += delta;
+  }
+  bloc[0] = l;
+  bloc[1] = r;
+}
+
+void tea_encrypt_file(char * file_name,unsigned int key[4])
+{
+  int fd;
+  unsigned int b[2];
+  int end;
+  int err;
+  fd = open(file_name,O_CREAT|O_TRUNC|O_RDWR,0644);
+  while(1)
+  {
+    memeset(b, '\0', 8);
+    end = read(fd,b,8);
+    err = fseek(fd,-2,SEEK_CUR);
+    if ( err == -1)
+    {
+      perror("Erreur lors du fseek ");
+      exit(-1);
+    }
+    if( end <= 0 )
+    {
+      break;
+    }
+    tea_encrypt_bloc(32,key,b);
+    end = write(fd,b,8);
+    if ( end == -1 )
+    {
+      perror("Erreur lors du write ");
+      exit(-1);
+    }
+  }
+  close(fd);
+}
+
+void tea_decrypt_file(char * file_name,unsigned int key[4])
+{
+  int fd;
+  unsigned int b[2];
+  int end;
+  int err;
+  fd = open(file_name,O_CREAT|O_TRUNC|O_RDWR,0644);
+  while(1)
+  {
+    memeset(b, '\0', 8);
+    end = read(fd,b,8);
+    err = fseek(fd,-2,SEEK_CUR);
+    if ( err == -1)
+    {
+      perror("Erreur lors du fseek ");
+      exit(-1);
+    }
+    if( end <= 0 )
+    {
+      break;
+    }
+    tea_decrypt_bloc(32,key,b);
+    end = write(fd,b,8);
+    if ( end == -1 )
+    {
+      perror("Erreur lors du write ");
+      exit(-1);
+    }
+  }
+  close(fd);
+}
+
+void get_key_from_file(unsigned short size_key,char * file_name)
+{
+  if ( size_key < )
 }
