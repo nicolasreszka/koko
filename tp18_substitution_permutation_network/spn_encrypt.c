@@ -10,6 +10,7 @@
 unsigned char 	substitution_array[16] = {3,8,14,1,12,5,10,0,2,7,9,11,4,6,15,13};
 unsigned char 	permutation_array[8]  = {5,2,0,4,6,1,7,3};
 
+
 void	substitution(unsigned char* block)
 {
 	int             i;

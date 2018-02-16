@@ -7,9 +7,22 @@
 #include "fcntl.h"
 #include "errno.h"
 
-unsigned char 	substitution_array[16] = {}
+unsigned char 	substitution_array[16] = {3,8,14,1,12,5,10,0,2,7,9,11,4,6,15,13};
+// {3,8,14,1,12,5,10,0,2,7,9,11, 4, 6, 15,13}; 
+//  0 1 2  3  4 5 6  7 8 9 10 11 12 13 14 15
 unsigned char 	permutation_array[8]  = {3,7,1,6,4,0,2,5};
 
+unsigned char	get_index(unsigned char value)
+{
+	unsigned char 	i;
+	for (i = 0; i < 16; i++)
+	{
+		if (substitution_array[i] == value)
+		{
+			return i;
+		}
+	}
+}
 
 void	substitution(unsigned char* block)
 {
@@ -19,8 +32,8 @@ void	substitution(unsigned char* block)
 	high = (*block & 0xF0) >> 4;
 	low  = *block & 0x0F;
 
-	high = substitution_array[high];
-	low  = substitution_array[low];
+	high = get_index(high);
+	low  = get_index(low);
 
 	*block = (high << 4) | low;
 }
