@@ -1,4 +1,4 @@
-/* Peut être amélioré et optimisé, mais ça marche :) */
+/* ça marche pas :/ */
 
 #include "stdio.h"
 #include "stdlib.h"
@@ -15,31 +15,32 @@ void	substitution(unsigned char* block)
 	int             i;
 	unsigned char   high,low;
 
-	high = *block & 0xF0 >> 4;
+	high = (*block & 0xF0) >> 4;
 	low  = *block & 0x0F;
 
 	high = substitution_array[high];
 	low  = substitution_array[low];
 
-	*block = (high << 4) & low;
+	*block = (high << 4) | low;
 }
 
 void	permutation(unsigned char* block)
 {
 	int		        i;
-	unsigned char	mask,bit,buffer;
+	unsigned int    mask;
+	unsigned char	bit,buffer;
 
 	mask   = 0x01;
 	bit    = 0;
 	buffer = 0x00;
 
-	for (i = 0; i < 8; i++)
+	for (i = 0; i < sizeof(unsigned char) * 8; i++)
 	{
 		bit = *block & mask;
 
 		if (permutation_array[i] - i < 0)
 		{
-			buffer = buffer | (bit >> -(permutation_array[i] - i));
+			buffer = buffer | (bit >> (-1 * (permutation_array[i] - i)));
 		}
 		else
 		{
@@ -126,7 +127,11 @@ int 	main(int argc, char** argv)
 			exit(errno);
 		}
 
-		encrypt(key,&block);
+		//printf("before :%x\n", block);
+
+		encrypt(&block,key);
+
+		//printf("after :%x\n", block);
 
 		write_result = write(file_out, &block, 1);
 
