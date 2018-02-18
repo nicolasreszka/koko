@@ -1,5 +1,3 @@
-/* ça marche pas :/ */
-
 #include "stdio.h"
 #include "stdlib.h"
 #include "string.h"
@@ -7,62 +5,52 @@
 #include "fcntl.h"
 #include "errno.h"
 
-unsigned char 	substitution_array[16] = {3,8,14,1,12,5,10,0,2,7,9,11,4,6,15,13};
-// {3,8,14,1,12,5,10,0,2,7,9,11, 4, 6, 15,13}; 
-//  0 1 2  3  4 5 6  7 8 9 10 11 12 13 14 15
-unsigned char 	permutation_array[8]  = {3,7,1,6,4,0,2,5};
+#define	SUBSTITUTION_SIZE 16
+#define PERMUTATION_SIZE 8
 
-unsigned char	get_index(unsigned char value)
+unsigned char 	substitution_array[SUBSTITUTION_SIZE] = {3,8,14,1,12,5,10,0,2,7,9,11,4,6,15,13};
+unsigned char 	permutation_array[PERMUTATION_SIZE]   = {5,2,0,4,6,1,7,3};
+
+unsigned char	get_index_from_value(unsigned char value, unsigned char* array, int size)
 {
 	unsigned char 	i;
-	for (i = 0; i < 16; i++)
+	for (i = 0; i < size; i++)
 	{
-		if (substitution_array[i] == value)
+		if (array[i] == value)
 		{
 			return i;
 		}
 	}
 }
 
-void	substitution(unsigned char* block)
+void	inverse_substitution(unsigned char* block)
 {
-	int             i;
 	unsigned char   high,low;
 
-	high = (*block & 0xF0) >> 4;
+	high = *block >> 4;
 	low  = *block & 0x0F;
 
-	high = get_index(high);
-	low  = get_index(low);
+	high = get_index_from_value(high,substitution_array,SUBSTITUTION_SIZE);
+	low  = get_index_from_value(low,substitution_array,SUBSTITUTION_SIZE);
 
 	*block = (high << 4) | low;
 }
 
-void	permutation(unsigned char* block)
+void	inverse_permutation(unsigned char* block)
 {
-	int		        i;
-	unsigned int    mask;
-	unsigned char	bit,buffer;
+	unsigned char i, mask, bit, buffer;
 
-	mask   = 0x01;
-	bit    = 0;
 	buffer = 0x00;
+	mask   = 0x01;
 
-	for (i = 0; i < sizeof(unsigned char) * 8; i++)
-	{
-		bit = *block & mask;
-
-		if (permutation_array[i] - i < 0)
-		{
-			buffer = buffer | (bit >> (-1 * (permutation_array[i] - i)));
-		}
-		else
-		{
-			buffer = buffer | (bit << (permutation_array[i] - i));
-		}
-		
-		mask = mask << 1;
-	}
+	for (i = 0; i < 8; i++)
+	{	   
+		bit     = (*block & mask);
+		bit   >>= i;       
+		bit   <<= get_index_from_value(i,permutation_array,PERMUTATION_SIZE);
+		buffer |= bit;
+		mask  <<= 1;
+	}	
 
 	*block = buffer;
 }
@@ -73,8 +61,8 @@ void 	decrypt(unsigned char* block, unsigned char key[2])
 
 	for (i = 1; i >= 0; i--)
 	{	
-		permutation(block);
-		substitution(block);
+		inverse_permutation(block);
+		inverse_substitution(block);
 		*block = *block ^ key[i];
 	}
 }
@@ -141,11 +129,7 @@ int 	main(int argc, char** argv)
 			exit(errno);
 		}
 
-		printf("before :%x\n", block);
-
 		decrypt(&block,key);
-
-		printf("after :%x\n", block);
 
 		write_result = write(file_out, &block, 1);
 

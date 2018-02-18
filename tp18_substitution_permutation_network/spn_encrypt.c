@@ -1,5 +1,3 @@
-/* ça marche pas :/ */
-
 #include "stdio.h"
 #include "stdlib.h"
 #include "string.h"
@@ -7,16 +5,17 @@
 #include "fcntl.h"
 #include "errno.h"
 
-unsigned char 	substitution_array[16] = {3,8,14,1,12,5,10,0,2,7,9,11,4,6,15,13};
-unsigned char 	permutation_array[8]  = {5,2,0,4,6,1,7,3};
+#define	SUBSTITUTION_SIZE 16
+#define PERMUTATION_SIZE 8
 
+unsigned char 	substitution_array[16] = {3,8,14,1,12,5,10,0,2,7,9,11,4,6,15,13};
+unsigned char 	permutation_array[8]   = {5,2,0,4,6,1,7,3};
 
 void	substitution(unsigned char* block)
 {
-	int             i;
 	unsigned char   high,low;
 
-	high = (*block & 0xF0) >> 4;
+	high = *block >> 4;
 	low  = *block & 0x0F;
 
 	high = substitution_array[high];
@@ -27,29 +26,19 @@ void	substitution(unsigned char* block)
 
 void	permutation(unsigned char* block)
 {
-	int		        i;
-	unsigned int    mask;
-	unsigned char	bit,buffer;
+	unsigned char i, mask, bit, buffer;
 
-	mask   = 0x01;
-	bit    = 0;
 	buffer = 0x00;
+	mask   = 0x01;
 
-	for (i = 0; i < sizeof(unsigned char) * 8; i++)
-	{
-		bit = *block & mask;
-
-		if (permutation_array[i] - i < 0)
-		{
-			buffer = buffer | (bit >> (-1 * (permutation_array[i] - i)));
-		}
-		else
-		{
-			buffer = buffer | (bit << (permutation_array[i] - i));
-		}
-		
-		mask = mask << 1;
-	}
+	for (i = 0; i < 8; i++)
+	{	   
+		bit   = (*block & mask);      /* Regarder si le bit i est à zéro */
+		bit >>= i;                    /* Décaler le bit i au début */
+		bit <<= permutation_array[i]; /* Décaler le bit i à la position p[i] */
+		buffer |= bit;                /* Placer le bit dans le résultat */
+		mask  <<= 1;                  /* Décaler le masque pour la prochaine itération */
+	}	
 
 	*block = buffer;
 }
@@ -128,11 +117,7 @@ int 	main(int argc, char** argv)
 			exit(errno);
 		}
 
-		//printf("before :%x\n", block);
-
 		encrypt(&block,key);
-
-		//printf("after :%x\n", block);
 
 		write_result = write(file_out, &block, 1);
 
