@@ -1,0 +1,114 @@
+2)	(a) quels blocs appartiennent au journal ?
+		
+		d'après 2m-img-parms.txt, le inode du journal est l'inode 8
+
+		debugfs : blocks <8>
+
+			cette commande nous donne les blocs 159 à 1187
+
+	(b) qui (quel inode) utilise le bloc 5 ?
+
+		debugfs : icheck 5
+			Block	Inode number
+			5	7
+
+	(c) où (dans quel bloc) est l'inode 7 ?
+
+		debugfs : imap <7>
+			Inode 7 is part of block group 0
+					located at block 20, offset 0x0300
+
+	(d) le bloc 12, que contient-il ?
+
+		debugfs:  block_dump 12
+			0000  0000 0000 0000 0000 0000 0000 0000 0000  ................
+			*
+
+			que des zéros
+
+	(e) quelle est la structure de l'inode 7 ?
+
+		debugfs:  inode_dump <7>
+			0000  8081 0000 0030 0404 1e41 535a 1e41 535a  .....0...ASZ.ASZ
+			0020  1e41 535a 0000 0000 0000 0100 2000 0000  .ASZ........ ...
+			0040  0000 0000 0000 0000 0000 0000 0000 0000  ................
+			*
+			0120  0000 0000 0000 0000 0000 0000 9e00 0000  ................
+			0140  0000 0000 0000 0000 0000 0000 0000 0000  ................
+			*
+
+	(f) "inode bitmap", que contient-il ?
+
+		d'après 2m-img-parms.txt, le inode bitmap est l'inode 19
+
+		debugfs:  inode_dump <19>
+			0000  0000 0000 0000 0000 0000 0000 0000 0000  ................
+			*
+
+			que des zéros
+
+3) Quel est le numéro d'inode qui correspond au répertoire /mnt/hd ?
+	
+	> ls -i /mnt/hd/
+		11 lost+found
+
+	L'inode 11
+
+
+8) 	(a) comment avez vous détecté le problème ?
+		
+ 		avec la commande suivante : 
+
+		> fsck -n /tmp/0image.ext3 
+			fsck from util-linux 2.29.2
+			e2fsck 1.43.4 (31-Jan-2017)
+			/tmp/0image.ext3 has gone 2888 days without being checked, check forced.
+			Pass 1: Checking inodes, blocks, and sizes
+			Pass 2: Checking directory structure
+			Pass 3: Checking directory connectivity
+			Pass 4: Checking reference counts
+			Unattached inode 20
+			Connect to /lost+found? no
+
+			Unattached inode 22
+			Connect to /lost+found? no
+
+			Inode 25 ref count is 1, should be 3.  Fix? no
+
+			Pass 5: Checking group summary information
+
+			/tmp/0image.ext3: ********** WARNING: Filesystem still has errors **********
+
+			/tmp/0image.ext3: 25/256 files (4.0% non-contiguous), 1109/2048 blocks
+
+	(b) quelles structures ont été endommageées ?
+
+		l'inode 20 et l'inode 22 sont détachées
+
+	(c) a quoi, plus précisément, consiste le dommage ?
+
+		l'inode 25 référence 3 fichiers d'différents
+
+	(d) quelles sont les conséquences de point de vue d'utilisateur ?
+
+		2 fichiers sont manquants du point de vue de l'utilisateur
+
+	(e) est-il possible de réparer le système ? Comment ?
+
+		il est possible de réparer le système
+
+		l'inode 20 est détachée
+		il faut trouver à quel block appartient l'inode 20
+
+		debugfs:  imap <20>
+			Inode 20 is part of block group 0
+				located at block 14, offset 0x0180
+
+		on remarque que l'inode 20 est localisé dans le block 14 
+		en tapant	"block_dump 14"	on peut voir le contenu du fichier à l'offset 0x0180
+
+
+
+
+
+

@@ -13,4 +13,4 @@ un_serv_echo_fork : un_serv_echo_fork.o
 	gcc -o un_serv_echo_fork un_serv_echo_fork.o
 
 clean:
-	rm *.o
+rm *.o
