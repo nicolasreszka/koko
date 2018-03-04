@@ -15,7 +15,7 @@ unsigned long int 	mask(unsigned char left, unsigned char right)
 	unsigned long int 	mask;
 
 	mask = 0xFFFFFFFFFFFFFFFF;
-	left = (sizeof(unsigned long int)-1) - left;
+	left = (sizeof(unsigned long int)*8)-1-left;
 	mask = (mask << left)  >> left;
 	mask = (mask >> right) << right;
 
@@ -37,7 +37,7 @@ elong 	el_add(elong a, elong b)
 	z = cut(a.low, 62,  0) + cut(b.low, 62,  0);
 	u = cut(a.low, 63, 63) + cut(b.low, 63, 63) + cut(z,63,63); 
 
-	sum.high = a.high + y.high + cut(u,1,1);
+	sum.high = a.high + b.high + cut(u,1,1);
 	sum.low  = (cut(u,0,0)<<63)| cut(z,62,0);
 
 	return 	sum;
@@ -49,11 +49,11 @@ elong 	el_multiply(unsigned long a, unsigned long b)
 	unsigned long int    a_high, a_low, b_high, b_low;
 	elong                z1, z2, z3, z4;
 
-	a_high = cut(a,63,32);
-	a_low  = cut(a,31, 0);
+	a_high  = cut(a,63,32);
+	a_low   = cut(a,31, 0);
 
-	b_high = cut(b,63,32);
-	b_low  = cut(b,31, 0);
+	b_high  = cut(b,63,32);
+	b_low   = cut(b,31, 0);
 
 	z1.high = a_high * b_high;
 	z1.low  = 0;
@@ -67,32 +67,37 @@ elong 	el_multiply(unsigned long a, unsigned long b)
 	z4.high = 0;
 	z4.low  = a_low * b_low;
 
-	return 	el_add(z1,el_add(z2,el_add(z3,z4)));
+	return  el_add(z1,el_add(z2,el_add(z3,z4)));
 }
 
 /* Complément à 2 */
-elong 	el_two_complement(elong n)
+// elong 	el_two_complement(elong n)
+// {
+
+// }
+
+/* Décalage de k vers la gauche */
+elong 	el_shift_left(elong n, unsigned char k)
 {
+	elong 	result;
 
-}
+	result.high = (n.high << k) | cut(n.low,63,64-k);
+	result.low  = (n.low  << k);
 
-/* Décalage vers la gauche */
-elong 	el_shift_left(elong n, unsigned char length)
-{
-
+	return 	result;
 }
 
 /* Remainder modulus : module < 2^64 */
 unsigned long int 	el_mod(elong n, elong mod)
 {
-
+	
 }
 
-/* Modular exponent : (a**b) mod m */
-unsigned long int 	el_exp(unsigned long a, unsigned long b, unsigned long m)
-{
+// /* Modular exponent : (a**b) mod m */
+// unsigned long int 	el_exp(unsigned long a, unsigned long b, unsigned long m)
+// {
 
-}
+// }
 
 
 
