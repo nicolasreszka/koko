@@ -90,12 +90,11 @@ elong 	el_shift_left(elong n, unsigned char k)
 /* Remainder modulus : m < 2^64 */
 unsigned long int 	el_mod(elong n, unsigned long m)
 {
-	elong 	result;
+	unsigned long int 	result;
 
 	if (n.high == 0)
 	{
-		result.high = 0;
-		result.low  = n.low % m;
+		result  = n.low % m;
 	}
 	else
 	{
