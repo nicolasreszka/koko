@@ -101,24 +101,40 @@ elong 	el_shift_left(elong n, unsigned char k)
 
 void 	el_print_hex(elong n)
 {
-	printf("%lx%lx\n", n.high,n.low);
+	if (n.high == 0)
+	{
+		printf("0x%lx\n",n.low);
+	}
+	else
+	{
+		printf("0x%lx%lx\n", n.high,n.low);
+	}
 }
 
 void	el_print_dec(elong n)
 {
-	printf("%lu%lu\n", n.high,n.low);
+	if (n.high == 0)
+	{
+		printf("%lu\n",n.low);
+	}
+	else
+	{
+		printf("%lu%lu\n", n.high,n.low);
+	}
 }
 
 int 	main(int argc, char** argv)
 {		
 	elong i;
-	i.high = 0xFF0000;
+	i.high = 0;
 	i.low  = 0xF000FA;
 
 	el_print_hex(i);
 
 	el_print_hex(el_add(i,i));
-	el_print_dec(el_multiply(0xFF00FFFFFF00,0xF00FFF0FFFFFA));
+	el_print_hex(el_multiply(0xFF00FFFFFF00,0xF00FFF0FFFFFA));
+
+	el_print_dec(el_multiply(2,4));
 
 	exit(EXIT_SUCCESS);
 }
