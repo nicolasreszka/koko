@@ -71,10 +71,10 @@ elong 	el_multiply(unsigned long a, unsigned long b)
 }
 
 /* Complément à 2 */
-// elong 	el_two_complement(elong n)
-// {
-
-// }
+elong 	el_two_complement(elong n)
+{
+	
+}
 
 /* Décalage de k vers la gauche */
 elong 	el_shift_left(elong n, unsigned char k)
@@ -87,17 +87,29 @@ elong 	el_shift_left(elong n, unsigned char k)
 	return 	result;
 }
 
-/* Remainder modulus : module < 2^64 */
-// unsigned long int 	el_mod(elong n, elong mod)
-// {
+/* Remainder modulus : m < 2^64 */
+unsigned long int 	el_mod(elong n, elong m)
+{
+	elong 	result;
 
-// }
+	if (n.high == 0)
+	{
+		result.high = 0;
+		result.low  = n.low % m;
+	}
+	else
+	{
 
-// /* Modular exponent : (a**b) mod m */
-// unsigned long int 	el_exp(unsigned long a, unsigned long b, unsigned long m)
-// {
+	}
 
-// }
+	return 	result;
+}
+
+/* Modular exponent : (a**b) mod m */
+unsigned long int 	el_exp(unsigned long a, unsigned long b, unsigned long m)
+{
+
+}
 
 void 	el_print_hex(elong n)
 {
