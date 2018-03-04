@@ -71,7 +71,7 @@ elong 	el_multiply(unsigned long a, unsigned long b)
 }
 
 /* Complément à 2 */
-elong 	el_two_complement(elong n)
+elong 	el_twos_complement(elong n)
 {
 	
 }
@@ -88,7 +88,7 @@ elong 	el_shift_left(elong n, unsigned char k)
 }
 
 /* Remainder modulus : m < 2^64 */
-unsigned long int 	el_mod(elong n, elong m)
+unsigned long int 	el_mod(elong n, unsigned long m)
 {
 	elong 	result;
 
