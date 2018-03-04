@@ -88,10 +88,10 @@ elong 	el_shift_left(elong n, unsigned char k)
 }
 
 /* Remainder modulus : module < 2^64 */
-unsigned long int 	el_mod(elong n, elong mod)
-{
-	
-}
+// unsigned long int 	el_mod(elong n, elong mod)
+// {
+
+// }
 
 // /* Modular exponent : (a**b) mod m */
 // unsigned long int 	el_exp(unsigned long a, unsigned long b, unsigned long m)
@@ -99,10 +99,26 @@ unsigned long int 	el_mod(elong n, elong mod)
 
 // }
 
+void 	el_print_hex(elong n)
+{
+	printf("%lx%lx\n", n.high,n.low);
+}
 
+void	el_print_dec(elong n)
+{
+	printf("%lu%lu\n", n.high,n.low);
+}
 
 int 	main(int argc, char** argv)
-{
-	
+{		
+	elong i;
+	i.high = 0xFF0000;
+	i.low  = 0xF000FA;
+
+	el_print_hex(i);
+
+	el_print_hex(el_add(i,i));
+	el_print_dec(el_multiply(0xFF00FFFFFF00,0xF00FFF0FFFFFA));
+
 	exit(EXIT_SUCCESS);
 }
