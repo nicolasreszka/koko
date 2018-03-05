@@ -110,40 +110,46 @@ elong 	el_twos_complement(elong n)
 
 
 /* Remainder modulus : m < 2^64 */
-// unsigned long int 	el_mod(elong n, unsigned long m)
-// {
-// 	unsigned long int   result;
-// 	unsigned char       shift_length;
-// 	elong               divisor;
+unsigned long int 	el_mod(elong n, unsigned long m)
+{
+	unsigned char       shift_length,i;
+	elong               result,divisor;
 
+	if (n.high == 0)
+	{
+		result.low = n.low % m;
+	}
+	else
+	{
+		shift_length = 63;
 
-// 	if (n.high == 0)
-// 	{
-// 		result = n.low % m;
-// 	}
-// 	else
-// 	{
-// 		shift_length = 63;
+		while (cut(m,shift_length,shift_length-1) == 0)
+		{
+			shift_length++;
+		}
 
-// 		while (cut(m,shift_length,shift_length-1) == 0)
-// 		{
-// 			shift_length++;
-// 		}
+		divisor.high = 0;
+		divisor.low  = m;
+		divisor = el_shift_left(divisor,shift_length);
 
-// 		divisor.high = 0;
-// 		divisor.low  = m;
-// 		divisor = el_shift_left(divisor,shift_length);
+		result.high = n.high;
+		result.low  = n.low;
 
-// 	}
+		for (i = 0; i < shift_length; i++)
+		{
+			result  = el_add(result, el_twos_complement(divisor));
+			divisor = el_shift_right(divisor,1);
+		}
+	}
 
-// 	return 	result;
-// }
+	return 	result.low;
+}
 
 /* Modular exponent : (a**b) mod m */
-unsigned long int 	el_exp(unsigned long a, unsigned long b, unsigned long m)
-{
+// unsigned long int 	el_exp(unsigned long a, unsigned long b, unsigned long m)
+// {
 
-}
+// }
 
 void 	el_print_hex(elong n)
 {
@@ -171,19 +177,18 @@ void	el_print_dec(elong n)
 
 void 	el_print_hex_format(elong n)
 {
-	printf("%016lx%016lx\n", n.high,n.low);
+	printf("%016lx.%016lx\n", n.high,n.low);
 }
 
 int 	main(int argc, char** argv)
 {		
 	elong i;
-	i.high = 0;
-	i.low  = 1;
+	i.high = 0x3;
+	i.low  = 0x60;
 
 	el_print_hex_format(i);
 
-	printf("test two Complement : \n");
-	el_print_hex_format(el_twos_complement(i));
+	printf("remainder modulus by %016lx : %016lx\n", 0x8001, el_mod(i,0x8001));
 
 	exit(EXIT_SUCCESS);
 }
