@@ -9,6 +9,36 @@ typedef struct elong_s
 } elong;
 
 
+void 	el_print_hex(elong n)
+{
+	if (n.high == 0)
+	{
+		printf("0x%lx\n",n.low);
+	}
+	else
+	{
+		printf("0x%lx%lx\n", n.high,n.low);
+	}
+}
+
+void	el_print_dec(elong n)
+{
+	if (n.high == 0)
+	{
+		printf("%lu\n",n.low);
+	}
+	else
+	{
+		printf("%lu%lu\n", n.high,n.low);
+	}
+}
+
+void 	el_print_hex_format(elong n)
+{
+	printf("%016lx.%016lx\n", n.high,n.low);
+}
+
+
 /* Renvoie un masque dont les bornes sont left et right */
 unsigned long int 	mask(unsigned char left, unsigned char right)
 {
@@ -135,16 +165,23 @@ unsigned long int 	el_mod(elong n, unsigned long m)
 			shift_length--;
 		}
 
-		shift_length = 63-shift_length;
+		shift_length = (63 - shift_length);
+
+		printf("shift_length :  %d\n", shift_length);
 
 		divisor.high = 0;
 		divisor.low  = m;
-		divisor = el_shift_left(divisor,shift_length);
+
+		divisor = el_shift_left(el_shift_left(divisor,64),shift_length);
+
+		printf("%016llx\n%016llx\n", divisor.high, n.high);
+
+		el_print_hex_format(divisor);
 
 		result.high = n.high;
 		result.low  = n.low;
 
-		for (i = 0; i < shift_length; i++)
+		for (i = 0; i < shift_length+64; i++)
 		{
 			result  = el_add(result, el_twos_complement(divisor));
 			divisor = el_shift_right(divisor,1);
@@ -159,35 +196,6 @@ unsigned long int 	el_mod(elong n, unsigned long m)
 // {
 
 // }
-
-void 	el_print_hex(elong n)
-{
-	if (n.high == 0)
-	{
-		printf("0x%lx\n",n.low);
-	}
-	else
-	{
-		printf("0x%lx%lx\n", n.high,n.low);
-	}
-}
-
-void	el_print_dec(elong n)
-{
-	if (n.high == 0)
-	{
-		printf("%lu\n",n.low);
-	}
-	else
-	{
-		printf("%lu%lu\n", n.high,n.low);
-	}
-}
-
-void 	el_print_hex_format(elong n)
-{
-	printf("%016lx.%016lx\n", n.high,n.low);
-}
 
 int 	main(int argc, char** argv)
 {		
