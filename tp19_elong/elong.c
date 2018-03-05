@@ -95,51 +95,49 @@ elong 	el_shift_right(elong n, unsigned char k)
 /* Complément à 2 */
 elong 	el_twos_complement(elong n)
 {
-	unsigned long int    high_bit, low_bit;
-	unsigned char        i;
-	elong                result;
+	elong 	a,b;
 
-	result.high = 0;
-	result.low  = 0;
+	a.high = ~(n.high);
+	a.low  = ~(n.low);
 
-	for (i = 0; i < 64; i++)
-	{
-		result.high |= (cut(result.low ,i,i) << i);
-		result.low  |= (cut(result.high,i,i) << i);
-	}
+	b.high = 0;
+	b.low  = 1;
 
-	return 	result;
+	n = el_add(a,b);
+
+	return n;
 }
+
 
 /* Remainder modulus : m < 2^64 */
-unsigned long int 	el_mod(elong n, unsigned long m)
-{
-	unsigned long int   result;
-	unsigned char       shift_length;
-	elong               divisor;
+// unsigned long int 	el_mod(elong n, unsigned long m)
+// {
+// 	unsigned long int   result;
+// 	unsigned char       shift_length;
+// 	elong               divisor;
 
 
-	if (n.high == 0)
-	{
-		result = n.low % m;
-	}
-	else
-	{
-		shift_length = 63;
+// 	if (n.high == 0)
+// 	{
+// 		result = n.low % m;
+// 	}
+// 	else
+// 	{
+// 		shift_length = 63;
 
-		while (cut(m,shift_length,shift_length-1) == 0)
-		{
-			shift_length++;
-		}
+// 		while (cut(m,shift_length,shift_length-1) == 0)
+// 		{
+// 			shift_length++;
+// 		}
 
-		divisor.high = 0;
-		divisor.low  = m;
-		divisor = el_shift_left(divisor,shift_length);
+// 		divisor.high = 0;
+// 		divisor.low  = m;
+// 		divisor = el_shift_left(divisor,shift_length);
 
-	}
+// 	}
 
-	return 	result;
-}
+// 	return 	result;
+// }
 
 /* Modular exponent : (a**b) mod m */
 unsigned long int 	el_exp(unsigned long a, unsigned long b, unsigned long m)
@@ -180,14 +178,12 @@ int 	main(int argc, char** argv)
 {		
 	elong i;
 	i.high = 0;
-	i.low  = 0xF000FA;
+	i.low  = 1;
 
-	el_print_hex(i);
+	el_print_hex_format(i);
 
-	el_print_hex(el_add(i,i));
-	el_print_hex(el_multiply(0xFF00FFFFFF00,0xF00FFF0FFFFFA));
-
-	el_print_dec(el_multiply(2,4));
+	printf("test two Complement : \n");
+	el_print_hex_format(el_twos_complement(i));
 
 	exit(EXIT_SUCCESS);
 }
