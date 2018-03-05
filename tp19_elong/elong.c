@@ -70,12 +70,6 @@ elong 	el_multiply(unsigned long a, unsigned long b)
 	return  el_add(z1,el_add(z2,el_add(z3,z4)));
 }
 
-/* Complément à 2 */
-elong 	el_twos_complement(elong n)
-{
-	
-}
-
 /* Décalage de k vers la gauche */
 elong 	el_shift_left(elong n, unsigned char k)
 {
@@ -87,17 +81,60 @@ elong 	el_shift_left(elong n, unsigned char k)
 	return 	result;
 }
 
+/* Décalage de k vers la droite */
+elong 	el_shift_right(elong n, unsigned char k)
+{
+	elong 	result;
+
+	result.high = (n.high >> k);
+	result.low  = (n.low  >> k) | (cut(n.high,k-1,0) << (64-k));
+
+	return 	result;
+}
+
+/* Complément à 2 */
+elong 	el_twos_complement(elong n)
+{
+	unsigned long int    high_bit, low_bit;
+	unsigned char        i;
+	elong                result;
+
+	result.high = 0;
+	result.low  = 0;
+
+	for (i = 0; i < 64; i++)
+	{
+		result.high |= (cut(result.low ,i,i) << i);
+		result.low  |= (cut(result.high,i,i) << i);
+	}
+
+	return 	result;
+}
+
 /* Remainder modulus : m < 2^64 */
 unsigned long int 	el_mod(elong n, unsigned long m)
 {
-	unsigned long int 	result;
+	unsigned long int   result;
+	unsigned char       shift_length;
+	elong               divisor;
+
 
 	if (n.high == 0)
 	{
-		result  = n.low % m;
+		result = n.low % m;
 	}
 	else
 	{
+		shift_length = 63;
+
+		while (cut(m,shift_length,shift_length-1) == 0)
+		{
+			shift_length++;
+		}
+
+		divisor.high = 0;
+		divisor.low  = m;
+		divisor = el_shift_left(divisor,shift_length);
 
 	}
 
@@ -132,6 +169,11 @@ void	el_print_dec(elong n)
 	{
 		printf("%lu%lu\n", n.high,n.low);
 	}
+}
+
+void 	el_print_hex_format(elong n)
+{
+	printf("%016lx%016lx\n", n.high,n.low);
 }
 
 int 	main(int argc, char** argv)
