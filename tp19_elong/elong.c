@@ -95,10 +95,17 @@ elong 	el_shift_right(elong n, unsigned char k)
 /* Complément à 2 */
 elong 	el_twos_complement(elong n)
 {
-	elong 	a,b;
+	elong           a,b;
+	unsigned char   i;
 
-	a.high = ~(n.high);
-	a.low  = ~(n.low);
+	a.high = 0;
+	a.low  = 0;
+
+	for (i = 0; i < 64; i++)
+	{
+		a.high |= (cut(n.high,i,i) ^ 1) << i;
+		a.low  |= (cut(n.low ,i,i) ^ 1) << i;
+	}
 
 	b.high = 0;
 	b.low  = 1;
@@ -123,10 +130,12 @@ unsigned long int 	el_mod(elong n, unsigned long m)
 	{
 		shift_length = 63;
 
-		while (cut(m,shift_length,shift_length-1) == 0)
+		while (cut(m,shift_length,shift_length) == 0)
 		{
-			shift_length++;
+			shift_length--;
 		}
+
+		shift_length = 63-shift_length;
 
 		divisor.high = 0;
 		divisor.low  = m;
