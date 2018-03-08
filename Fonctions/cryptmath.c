@@ -1,6 +1,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+
 
 void rotOctetD(unsigned char * octet,int cycle)
 {
@@ -120,7 +125,7 @@ void substNibbleOctet(unsigned char * octet, unsigned int substListe[16],int cyc
 {
   int i;
   unsigned char buff=0x0,buff2=0x0, mask = 0xf;
-  for ( i = 0 , i < cycle ; i++ )
+  for ( i = 0 ; i < cycle ; i++ )
     {
       buff = *octet;
       buff &= mask;
@@ -140,7 +145,7 @@ void substDiadeOctet(unsigned char * octet, unsigned int substListe[4],int cycle
 {
    int i;
    unsigned char buff=0x0,buff2=0x0,buff3=0x0,buff4=0x0, mask = 0x3;
-  for ( i = 0 , i < cycle ; i++ )
+  for ( i = 0 ; i < cycle ; i++ )
     {
       buff = *octet;
       buff &= mask;
@@ -225,7 +230,6 @@ void tea_encrypt_bloc(unsigned int tour, unsigned int key[4], unsigned int bloc[
   unsigned int i;
   unsigned int l = bloc[0];
   unsigned int r = bloc[1];
-  unsigned int lpu;
   unsigned int delta = 0x9e3779b9;
   for ( i = 0 ; i < tour ; i++ )
   {
@@ -242,7 +246,6 @@ void tea_encrypt_bloc(unsigned int tour, unsigned int key[4], unsigned int bloc[
   unsigned i;
   unsigned l = bloc[0];
   unsigned int r = bloc[1];
-  unsigned int lpu;
   unsigned int delta = 0x9e3779b9;
   for ( i = 0 ; i < tour ; i++ )
   {
@@ -254,83 +257,231 @@ void tea_encrypt_bloc(unsigned int tour, unsigned int key[4], unsigned int bloc[
   bloc[1] = r;
 }
 
-void tea_encrypt_file(char * file_name,unsigned int key[4])
+
+/* Fonction tea_encrypt_file
+ * arguments :
+ * file_name : chaine de caractères qui contient le nom du fichier
+ * key[4] : tableau d'unsigned int qui contient la clef de chiffrement divisée en 4.
+ * tour : int qui représente le nombre de "tour"/cycle à effectuer lors du chiffrement. 
+ *
+ * retour : aucun
+ *
+ * Effets : Lors du cas nominal ( sans problemes ) chiffre le fichier en utilisant la méthode tea.
+ * Le fichier de l'utilisateur est modifié ( chiffré ) et ne pourra donc pas être lu avant d'être déchiffré.
+ * Lors d'une erreur lors d'un read, le fichier de l'utilisateur n'est pas corrompu.
+ * Lors d'une erreur lors d'un write sur le fichier à chiffrer, le fichier risque d'être corrompu.
+ * Pour recover le fichier, vous pouver regarder dans le repertoire courant, un fichier bufferfile.dat à été créer.
+ * Celui-ci est le fichier chiffré sous un autre nom.
+ * En cas d'erreur lors d'un write sur bufferfile.dat, le fichier à chiffrer n'a pas été altéré ou modifié.
+ * Vous pouvez donc reessayer la méthode qui à pu échouer à cause de certaine erreurs système ou abandonner.
+ */
+
+void tea_encrypt_file(char * file_name,unsigned int key[4],unsigned int tour)
 {
-  int fd;
-  unsigned int b[2];
-  int end;
-  int err;
-  fd = open(file_name,O_CREAT|O_TRUNC|O_RDWR,0644);
+
+  int input_file_descriptor; /* Descripteur de fichier du fichier à chiffrer */
+  int buffer_file_descriptor; /* Descripteur de fichier du fichier temporaire */
+
+  unsigned int bloc[2]; /* Tableau qui contient les deux moitiées du bloc à chiffrer */
+
+  int end; /* Variable utilisé par le read pour déterminer la fin du fichier */
+  int err; /* Variable utilisé pour la gestion des erreurs */
+
+  /* On ouvre le fichier à chiffrer en readonly en premier temps. */
+  input_file_descriptor = open(file_name,O_RDONLY,0444);
+  if ( input_file_descriptor < 0 )
+  {
+    perror("tea_encrypt_file(cryptmath.c) : Erreur lors du open de input_file_descriptor en mode readonly ");
+    exit(-1);
+  }
+
+  /* On ouvre/creer temporaire. */
+  buffer_file_descriptor = open("bufferfile.dat",O_CREAT|O_TRUNC|O_WRONLY,0644);
+  if ( buffer_file_descriptor < 0 )
+  {
+    perror("tea_encrypt_file(cryptmath.c) : Erreur lors du open de buffer_file_descriptor en mode writeonly ");
+    exit(-1);
+  }
+
+  /* Boucle qui parcours le fichier.
+   * S'arrete à la fin du fichier ( lorsque read return 0 )
+   * Pour chaque bloc du fichier à chiffrer, le chiffrer puis l'écrire dans le fichier temporaire.
+   */
   while(1)
   {
-    memeset(b, '\0', 8);
-    end = read(fd,b,8);
-    err = fseek(fd,-2,SEEK_CUR);
-    if ( err == -1)
+    memset(bloc, '\0', 8);
+    end = read(input_file_descriptor,bloc,8);
+    if ( end == -1)
     {
-      perror("Erreur lors du fseek ");
+      perror("tea_encrypt_file(cryptmath.c) : Erreur lors du read de input_file_name ");
       exit(-1);
     }
-    if( end <= 0 )
+    if( end == 0 )
     {
       break;
     }
-    tea_encrypt_bloc(32,key,b);
-    end = write(fd,b,8);
-    if ( end == -1 )
+    tea_encrypt_bloc(tour,key,bloc);
+    err = write(buffer_file_descriptor,bloc,8);
+    if ( err < 0 )
     {
-      perror("Erreur lors du write ");
+      perror("tea_encrypt_file(cryptmath.c) : Erreur lors du write sur buffer_file_name ");
       exit(-1);
     }
   }
-  close(fd);
-}
 
-void tea_decrypt_file(char * file_name,unsigned int key[4])
-{
-  int fd;
-  unsigned int b[2];
-  int end;
-  int err;
-  fd = open(file_name,O_CREAT|O_TRUNC|O_RDWR,0644);
+  close(input_file_descriptor);
+  close(buffer_file_descriptor);
+
+  input_file_descriptor = open(file_name,O_TRUNC|O_WRONLY,0644);
+  if( input_file_descriptor < 0 )
+  {
+    perror("tea_encrypt_file(cryptmath.c) : Erreur lors du open de input_file en mode writeonly ");
+    exit(-1);
+  }
+
+  buffer_file_descriptor = open("bufferfile.dat",O_RDONLY,0444);
+  if( buffer_file_descriptor < 0 )
+  {
+    perror("tea_encrypt_file(cryptmath.c) : Erreur lors du open de buffer_file en mode readonly ");
+    exit(-1);
+  }
+
   while(1)
   {
-    memeset(b, '\0', 8);
-    end = read(fd,b,8);
-    err = fseek(fd,-2,SEEK_CUR);
-    if ( err == -1)
+    memset(bloc, '\0', 8);
+    end = read(buffer_file_descriptor,bloc,8);
+    if ( end < 0 )
     {
-      perror("Erreur lors du fseek ");
+      perror("tea_encrypt_file(cryptmath.c) : Erreur lors du write sur buffer_file_descriptor ");
       exit(-1);
     }
-    if( end <= 0 )
+    if( end == 0 )
     {
       break;
     }
-    tea_decrypt_bloc(32,key,b);
-    end = write(fd,b,8);
-    if ( end == -1 )
+    err = write(input_file_descriptor,bloc,8);
+    if ( err < 0 )
     {
-      perror("Erreur lors du write ");
+      perror("tea_encrypt_file(cryptmath.c) : Erreur lors du write sur input_file_name ");
       exit(-1);
     }
   }
-  close(fd);
+
+  close(input_file_descriptor);
+  close(buffer_file_descriptor);
 }
 
-unsigned char get_char_key_from_file(char * file_name);
+
+/* Fonction tea_decrypt_file
+ *
+ * arguments :
+ * file_name : chaine de caractères qui contient le nom du fichier
+ * key[4] : tableau d'unsigned int qui contient la clef de chiffrement divisée en 4.
+ * tour : int qui représente le nombre de "tour"/cycle à effectuer lors du chiffrement.
+ *
+ * retour : aucun
+ *
+ */
+
+void tea_decrypt_file(char * file_name,unsigned int key[4],unsigned int tour)
+{
+  int input_file_descriptor;
+  int buffer_file_descriptor;
+  unsigned int bloc[2];
+  int end;
+  int err;
+  input_file_descriptor = open(file_name,O_RDONLY,0444);
+  if ( input_file_descriptor < 0 )
+  {
+    perror("tea_decrypt_file(cryptmath.c) : Erreur lors du open de input_file en mode readonly ");
+    exit(-1);
+  }
+  buffer_file_descriptor = open("bufferfile.dat",O_WRONLY|O_TRUNC|O_CREAT,0644);
+  if ( buffer_file_descriptor < 0 )
+  {
+    perror("tea_decrypt_file(cryptmath.c) : Erreur lors du open de buffer_file en mode writeonly ");
+    exit(-1);
+  }
+  while(1)
+  {
+    memset(bloc, '\0', 8);
+    end = read(input_file_descriptor,bloc,8);
+    if ( end < 0 )
+    {
+      perror("tea_decrypt_file(cryptmath.c) : Erreur lors du read sur input_file ");
+      exit(-1);
+    }
+    if( end == 0 )
+    {
+      break;
+    }
+    tea_decrypt_bloc(tour,key,bloc);
+    end = write(buffer_file_descriptor,bloc,8);
+    if ( end == -1 )
+    {
+      perror("tea_decrypt_file(cryptmath.c) : Erreur lors du write sur buffer_file ");
+      exit(-1);
+    }
+  }
+  close(input_file_descriptor);
+  close(buffer_file_descriptor);
+
+  input_file_descriptor = open(file_name,O_RDONLY,0444);
+  if ( input_file_descriptor < 0 )
+  {
+    perror("tea_decrypt_file(cryptmath.c) : Erreur lors du open de input_file en mode readonly ");
+    exit(-1);
+  }
+
+  buffer_file_descriptor = open("bufferfile.dat",O_RDONLY,0444);
+  if ( buffer_file_descriptor < 0 )
+  {
+    perror("tea_decrypt_file(cryptmath.c) : Erreur lors du open de buffer_file en mode writeonly ");
+    exit(-1);
+  }
+
+  while(1)
+  {
+    memset(bloc,'\0', 8);
+
+    end = read(buffer_file_descriptor,bloc,8);
+    if ( end < 0 )
+    {
+      perror("tea_decrypt_file(cryptmath.c) : Erreur lors du read sur buffer_file ");
+      exit(-1);
+    }
+    if ( end == 0 )
+    {
+      break;
+    }
+
+    err = write(input_file_descriptor,bloc,8);
+    if ( err < 0 )
+    {
+      perror("tea_decrypt_file(cryptmath.c) : Erreur lors du write sur input_file ");
+      exit(-1);
+    }
+
+  }
+
+  close(input_file_descriptor);
+  close(buffer_file_descriptor);
+
+}
+
+unsigned char get_char_key_from_file(char * file_name)
 {
   int fd;
   int err;
   unsigned char result;
-  fd = open(file_name);
+  fd = open(file_name,O_RDONLY,0444);
   if ( fd == -1 )
   {
     perror("get_char_key_from_file : Erreur lors du open ");
     exit(-1);
   }
   err = read(fd,&result,sizeof(char));
-  if ( err < sizeof(char))
+  if ( err < (int) sizeof(char) )
   {
     perror("get_char_key_from_file : Erreur lors du read ");
     exit(-1);
@@ -344,19 +495,19 @@ unsigned char get_char_key_from_file(char * file_name);
   return result;
 }
 
-unsigned short get_short_key_from_file(char * file_name);
+unsigned short get_short_key_from_file(char * file_name)
 {
   int fd;
   int err;
   unsigned short result;
-  fd = open(file_name);
+  fd = open(file_name,O_RDONLY,0444);
   if ( fd == -1 )
   {
     perror("get_short_key_from_file : Erreur lors du open ");
     exit(-1);
   }
   err = read(fd,&result,sizeof(short));
-  if ( err < sizeof(short))
+  if ( err < (int) sizeof(short))
   {
     perror("get_short_key_from_file : Erreur lors du read ");
     exit(-1);
@@ -370,19 +521,19 @@ unsigned short get_short_key_from_file(char * file_name);
   return result;
 }
 
-unsigned int get_int_key_from_file(char * file_name);
+unsigned int get_int_key_from_file(char * file_name)
 {
   int fd;
   int err;
   unsigned int result;
-  fd = open(file_name);
+  fd = open(file_name,O_RDONLY,0444);
   if ( fd == -1 )
   {
     perror("get_int_key_from_file : Erreur lors du open ");
     exit(-1);
   }
   err = read(fd,&result,sizeof(int));
-  if ( err < sizeof(int))
+  if ( err < (int) sizeof(int))
   {
     perror("get_int_key_from_file : Erreur lors du read ");
     exit(-1);
@@ -396,19 +547,19 @@ unsigned int get_int_key_from_file(char * file_name);
   return result;
 }
 
-unsigned long get_long_key_from_file(char * file_name);
+unsigned long get_long_key_from_file(char * file_name)
 {
   int fd;
   int err;
   unsigned long result;
-  fd = open(file_name);
+  fd = open(file_name,O_RDONLY,0444);
   if ( fd == -1 )
   {
     perror("get_long_key_from_file : Erreur lors du open ");
     exit(-1);
   }
   err = read(fd,&result,sizeof(long));
-  if ( err < sizeof(long))
+  if ( err < (int) sizeof(long))
   {
     perror("get_long_key_from_file : Erreur lors du read ");
     exit(-1);
@@ -422,19 +573,19 @@ unsigned long get_long_key_from_file(char * file_name);
   return result;
 }
 
-unsigned long long get_long_long_key_from_file(char * file_name);
+unsigned long long get_long_long_key_from_file(char * file_name)
 {
   int fd;
   int err;
   unsigned long long result;
-  fd = open(file_name);
+  fd = open(file_name,O_RDONLY,0444);
   if ( fd == -1 )
   {
     perror("get_long_long_key_from_file : Erreur lors du open ");
     exit(-1);
   }
   err = read(fd,&result,sizeof(long long));
-  if ( err < sizeof(long long))
+  if ( err < (int) sizeof(long long))
   {
     perror("get_long_long_key_from_file : Erreur lors du read ");
     exit(-1);
@@ -453,7 +604,7 @@ void * get_unkown_key_from_file(char * file_name)
   int fd;
   int err;
   void * result;
-  fd = open(file_name);
+  fd = open(file_name,O_RDONLY,0444);
   if ( fd == -1 )
   {
     perror("get_unkown_key_from_file : Erreur lors du open ");
