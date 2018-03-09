@@ -42,20 +42,43 @@ void 	el_print_hex_format(elong n)
 /* Renvoie un masque dont les bornes sont left et right */
 unsigned long int 	mask(unsigned char left, unsigned char right)
 {
-	unsigned long int 	mask;
+	unsigned long int 	m;
 
-	mask = 0xFFFFFFFFFFFFFFFF;
+	m    = 0xFFFFFFFFFFFFFFFF;
 	left = (sizeof(unsigned long int)*8)-1-left;
-	mask = (mask << left)  >> left;
-	mask = (mask >> right) << right;
+	m    = (m << left)  >> left;
+	m    = (m >> right) << right;
 
-	return 	mask;
+	return 	m;
 }
 
 /* Coupe un entier x aux bornes left et right */
 unsigned long int 	cut(unsigned long int x, unsigned char left, unsigned char right)
 {
 	return (x & mask(left, right)) >> right;
+}
+
+/* Revoie le nombre de zéros de poids fort */
+unsigned char	zero_prefix(unsigned long int x)
+{
+	unsigned long int    m;
+	unsigned char        counter;
+
+	m       = 0x8000000000000000;
+	counter = 0;
+
+	while (1)	
+	{
+		if ((x & m) != 0)
+		{
+			break;
+		}
+
+		counter++;
+		m >>= 1;
+	}
+
+	return counter;
 }
 
 /* Addition */
@@ -105,19 +128,31 @@ elong 	el_shift_left(elong n, unsigned char k)
 {
 	elong 	result;
 
-	result.high = (n.high << k) | cut(n.low,63,64-k);
-	result.low  = (n.low  << k);
-
+	if (k == 0)
+	{
+		result = n;
+	}
+	else if (k <= 64)
+	{
+		result.high = (n.high << k) | cut(n.low,63,64-k);
+		result.low  = (n.low  << k);
+	}
+	else
+	{
+		result.high = n.low << (k-64);
+		result.low  = 0;
+	}
+	
 	return 	result;
 }
 
 /* Décalage de k vers la droite */
-elong 	el_shift_right(elong n, unsigned char k)
+elong 	el_shift_right(elong n)
 {
 	elong 	result;
 
-	result.high = (n.high >> k);
-	result.low  = (n.low  >> k) | (cut(n.high,k-1,0) << (64-k));
+	result.high = (n.high >> 1);
+	result.low  = (n.low  >> 1) | cut(n.high,0,0);
 
 	return 	result;
 }
@@ -149,7 +184,7 @@ elong 	el_twos_complement(elong n)
 /* Remainder modulus : m < 2^64 */
 unsigned long int 	el_mod(elong n, unsigned long m)
 {
-	unsigned char       shift_length,i;
+	unsigned char       shift_length;
 	elong               result,divisor;
 
 	if (n.high == 0)
@@ -158,33 +193,33 @@ unsigned long int 	el_mod(elong n, unsigned long m)
 	}
 	else
 	{
-		shift_length = 63;
-
-		while (cut(m,shift_length,shift_length) == 0)
-		{
-			shift_length--;
-		}
-
-		shift_length = (63 - shift_length);
-
-		printf("shift_length :  %d\n", shift_length);
+		shift_length = (64 + zero_prefix(m))-1;
 
 		divisor.high = 0;
 		divisor.low  = m;
 
-		divisor = el_shift_left(el_shift_left(divisor,64),shift_length);
+		divisor = el_shift_left(divisor,shift_length);
 
-		printf("%016llx\n%016llx\n", divisor.high, n.high);
+		printf("%016lx\n", divisor.high);
 
-		el_print_hex_format(divisor);
+		result = n;
 
-		result.high = n.high;
-		result.low  = n.low;
-
-		for (i = 0; i < shift_length+64; i++)
+		while (1)
 		{
-			result  = el_add(result, el_twos_complement(divisor));
-			divisor = el_shift_right(divisor,1);
+			if (result.high == 0) 
+			{
+				break;
+			}
+			
+			if ((result.high > divisor.high) 
+			|| (result.high == divisor.high && result.low >= divisor.low))
+			{
+				result = el_add(result,el_twos_complement(divisor));
+			}
+
+			divisor = el_shift_right(divisor);
+
+			el_print_hex_format(divisor);
 		}
 	}
 
@@ -201,11 +236,13 @@ int 	main(int argc, char** argv)
 {		
 	elong i;
 	i.high = 0x3;
-	i.low  = 0x60;
+	i.low  = 0x6000000000000085;
 
 	el_print_hex_format(i);
 
-	printf("remainder modulus by %016lx : %016lx\n", 0x8001, el_mod(i,0x8001));
+	printf("remainder modulus by %016lx : %016lx\n", 0x80000, el_mod(i,0x80000));
 
 	exit(EXIT_SUCCESS);
+
+
 }
