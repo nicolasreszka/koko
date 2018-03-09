@@ -206,7 +206,7 @@ unsigned long int 	el_mod(elong n, unsigned long m)
 
 		while (1)
 		{
-			if (result.high == 0) 
+			if (result.high == 0 && result.low < m) 
 			{
 				break;
 			}
@@ -218,8 +218,6 @@ unsigned long int 	el_mod(elong n, unsigned long m)
 			}
 
 			divisor = el_shift_right(divisor);
-
-			el_print_hex_format(divisor);
 		}
 	}
 
@@ -236,11 +234,11 @@ int 	main(int argc, char** argv)
 {		
 	elong i;
 	i.high = 0x3;
-	i.low  = 0x6000000000000085;
+	i.low  = 0x0060000000000085;
 
 	el_print_hex_format(i);
 
-	printf("remainder modulus by %016lx : %016lx\n", 0x80000, el_mod(i,0x80000));
+	printf("remainder modulus by %016lx : %016lx\n", 0x8fff0, el_mod(i,0x8fff0));
 
 	exit(EXIT_SUCCESS);
 
