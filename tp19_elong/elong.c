@@ -152,7 +152,7 @@ elong 	el_shift_right(elong n)
 	elong 	result;
 
 	result.high = (n.high >> 1);
-	result.low  = (n.low  >> 1) | cut(n.high,0,0);
+	result.low  = (n.low  >> 1) | (cut(n.high,0,0) << 63);
 
 	return 	result;
 }
