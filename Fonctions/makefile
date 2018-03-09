@@ -1,7 +1,7 @@
 test: test.o cryptmath.o
 	gcc -o test test.o cryptmath.o
 
-cryptmath.o: cryptmath.c
+cryptmath.o: cryptmath.c cryptmath.h
 	gcc -o cryptmath.o -c cryptmath.c 
 
 test.o: test.c cryptmath.h

@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include "math.h"
+#include "cryptmath.h"
 
 int main(int argc,char** argv)
 {
@@ -11,6 +11,9 @@ int main(int argc,char** argv)
 		exit(-1);
 	}
 
-	tea_encrypt_file(argv[1],key,32);
-	tea_decrypt_file(argv[1],key,32);
+	unsigned long int test = 0xffffffffffffffff;
+	test &= mask(7,0);
+	printf("res = %lu \n", test);
+	test = cut(test,7,5);
+	printf("res = %lu \n", test);
 }

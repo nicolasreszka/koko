@@ -5,6 +5,9 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
+#include "cryptmath.h"
+
+/* ATTENTION, les fonctions non commentés ne doivent pas être utilisés, risque de bug et/ou de perte de données. */
 
 
 void rotOctetD(unsigned char * octet,int cycle)
@@ -258,7 +261,7 @@ void tea_encrypt_bloc(unsigned int tour, unsigned int key[4], unsigned int bloc[
 }
 
 
-/* Fonction tea_encrypt_file
+/* Fonction tea_encrypt_file   NON FONCTIONNELLE
  * arguments :
  * file_name : chaine de caractères qui contient le nom du fichier
  * key[4] : tableau d'unsigned int qui contient la clef de chiffrement divisée en 4.
@@ -372,7 +375,7 @@ void tea_encrypt_file(char * file_name,unsigned int key[4],unsigned int tour)
 }
 
 
-/* Fonction tea_decrypt_file
+/* Fonction tea_decrypt_file    NON FONCTIONNELLE
  *
  * arguments :
  * file_name : chaine de caractères qui contient le nom du fichier
@@ -381,6 +384,10 @@ void tea_encrypt_file(char * file_name,unsigned int key[4],unsigned int tour)
  *
  * retour : aucun
  *
+ * Effet : lors du cas nominal, cette fonction dechiffre le fichier input_file.
+ * En cas d'erreur lors du read input_file ou du write buffer_file, input_file n'a pas été altéré
+ * En cas d'erreur lors du read buffer_file ou du write input_file, input_file a été altéré.
+ * Il est cependant possible de récupérer le fichier en regardant buffer_file qui est decrypter et non altéré.
  */
 
 void tea_decrypt_file(char * file_name,unsigned int key[4],unsigned int tour)
@@ -426,17 +433,17 @@ void tea_decrypt_file(char * file_name,unsigned int key[4],unsigned int tour)
   close(input_file_descriptor);
   close(buffer_file_descriptor);
 
-  input_file_descriptor = open(file_name,O_RDONLY,0444);
+  input_file_descriptor = open(file_name,O_WRONLY|O_TRUNC,0644);
   if ( input_file_descriptor < 0 )
   {
-    perror("tea_decrypt_file(cryptmath.c) : Erreur lors du open de input_file en mode readonly ");
+    perror("tea_decrypt_file(cryptmath.c) : Erreur lors du open de input_file en mode writeonly ");
     exit(-1);
   }
 
   buffer_file_descriptor = open("bufferfile.dat",O_RDONLY,0444);
   if ( buffer_file_descriptor < 0 )
   {
-    perror("tea_decrypt_file(cryptmath.c) : Erreur lors du open de buffer_file en mode writeonly ");
+    perror("tea_decrypt_file(cryptmath.c) : Erreur lors du open de buffer_file en mode readonly ");
     exit(-1);
   }
 
@@ -469,145 +476,97 @@ void tea_decrypt_file(char * file_name,unsigned int key[4],unsigned int tour)
 
 }
 
-unsigned char get_char_key_from_file(char * file_name)
+
+
+/* Fonction mask
+ * 
+ * arguments : 
+ * unsigned char l => bord gauche inclus
+ * unsigned char r -> bord droit inclus
+ *
+ * return : unsigned char mask  ( masque qui contient des 1 entre les borne spécifiées )
+ *
+ * Exemple : l = 7 , r = 0  => renvoie 0x11111111
+ * Exemple 2 : Exemple : l = 7 , r = 1  => renvoie 0x11111110
+ */ 
+
+unsigned long int mask(unsigned char l,unsigned char r)
 {
-  int fd;
-  int err;
-  unsigned char result;
-  fd = open(file_name,O_RDONLY,0444);
-  if ( fd == -1 )
+  unsigned long int c = 0x0;
+  unsigned char i;
+  unsigned long int msk = 0x1;
+  unsigned long int res = 0x0;
+  for ( i = 0 ; i < r ; i++ )
   {
-    perror("get_char_key_from_file : Erreur lors du open ");
-    exit(-1);
+    msk <<= 1;
   }
-  err = read(fd,&result,sizeof(char));
-  if ( err < (int) sizeof(char) )
+  for ( i = 0 ; i <= l-r ; i++ )
   {
-    perror("get_char_key_from_file : Erreur lors du read ");
-    exit(-1);
+    printf("mask : %lu\n", msk);
+    res |= msk;
+    msk <<= 1;
   }
-  err = close(fd);
-  if ( err == -1)
-  {
-    perror("get_char_key_from_file : Erreur lors du close ");
-    exit(-1);
-  }
-  return result;
+  return res;
 }
 
-unsigned short get_short_key_from_file(char * file_name)
+unsigned long int cut(unsigned long int x,unsigned char l,unsigned char r)
 {
-  int fd;
-  int err;
-  unsigned short result;
-  fd = open(file_name,O_RDONLY,0444);
-  if ( fd == -1 )
-  {
-    perror("get_short_key_from_file : Erreur lors du open ");
-    exit(-1);
-  }
-  err = read(fd,&result,sizeof(short));
-  if ( err < (int) sizeof(short))
-  {
-    perror("get_short_key_from_file : Erreur lors du read ");
-    exit(-1);
-  }
-  err = close(fd);
-  if ( err == -1)
-  {
-    perror("get_short_key_from_file : Erreur lors du close ");
-    exit(-1);
-  }
-  return result;
+  return (x&mask(l,r))>>r;
 }
 
-unsigned int get_int_key_from_file(char * file_name)
+struct elong elshiftr(struct elong a, unsigned char z)
 {
-  int fd;
-  int err;
-  unsigned int result;
-  fd = open(file_name,O_RDONLY,0444);
-  if ( fd == -1 )
+  if ( z == 0 ) return a;
+  if ( z >= 64 )
   {
-    perror("get_int_key_from_file : Erreur lors du open ");
-    exit(-1);
+    a.l = a.h;
+    a.l >>= z-64;
+    a.h = 0;
   }
-  err = read(fd,&result,sizeof(int));
-  if ( err < (int) sizeof(int))
+  else
   {
-    perror("get_int_key_from_file : Erreur lors du read ");
-    exit(-1);
+    a.l >>= z;
+    a.l |= cut(a.h,z,0);
+    a.h >>= z;
   }
-  err = close(fd);
-  if ( err == -1)
-  {
-    perror("get_int_key_from_file : Erreur lors du close ");
-    exit(-1);
-  }
-  return result;
+  return a;
 }
 
-unsigned long get_long_key_from_file(char * file_name)
+struct elong elshiftl(struct elong a, unsigned char z)
 {
-  int fd;
-  int err;
-  unsigned long result;
-  fd = open(file_name,O_RDONLY,0444);
-  if ( fd == -1 )
+  if ( z == 0 ) return a;
+  if ( z >= 64 )
   {
-    perror("get_long_key_from_file : Erreur lors du open ");
-    exit(-1);
+    a.h = a.l;
+    a.h <<= z-64;
+    a.l = 0;
   }
-  err = read(fd,&result,sizeof(long));
-  if ( err < (int) sizeof(long))
+  else
   {
-    perror("get_long_key_from_file : Erreur lors du read ");
-    exit(-1);
+    a.h <<= z;
+    a.h |= ( a.l & mask(63,63-r));
+    a.l <<= z;
   }
-  err = close(fd);
-  if ( err == -1)
-  {
-    perror("get_long_key_from_file : Erreur lors du close ");
-    exit(-1);
-  }
-  return result;
 }
 
-unsigned long long get_long_long_key_from_file(char * file_name)
+
+struct elong eladd(struct elong a,struct elong b )
 {
-  int fd;
-  int err;
-  unsigned long long result;
-  fd = open(file_name,O_RDONLY,0444);
-  if ( fd == -1 )
-  {
-    perror("get_long_long_key_from_file : Erreur lors du open ");
-    exit(-1);
-  }
-  err = read(fd,&result,sizeof(long long));
-  if ( err < (int) sizeof(long long))
-  {
-    perror("get_long_long_key_from_file : Erreur lors du read ");
-    exit(-1);
-  }
-  err = close(fd);
-  if ( err == -1)
-  {
-    perror("get_long_long_key_from_file : Erreur lors du close ");
-    exit(-1);
-  }
-  return result;
+  unsigned long int a63;
+  unsigned long int b63;
+  struct elong d;
+  unsigned long int head_mask = 0x8000000000000000;
+
+  a63 = ( a.h & head_mask ) >> 63;
+  b63 = ( b.h & head_mask ) >> 63;
+  d.l = a.l+b.l;
+  d.h = a.h + b.h + a63 + b63;
+
+  return d;
+
 }
 
-void * get_unkown_key_from_file(char * file_name)
+struct elong elmul(unsigned long a, unsigned long b)
 {
-  int fd;
-  int err;
-  void * result;
-  fd = open(file_name,O_RDONLY,0444);
-  if ( fd == -1 )
-  {
-    perror("get_unkown_key_from_file : Erreur lors du open ");
-    exit(-1);
-  }
+
 }
