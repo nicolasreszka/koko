@@ -8,7 +8,7 @@ typedef struct elong_s
 	unsigned long int low;
 } elong;
 
-
+/* Print un elong n en base 16 */
 void 	el_print_hex(elong n)
 {
 	if (n.high == 0)
@@ -21,6 +21,7 @@ void 	el_print_hex(elong n)
 	}
 }
 
+/* Print un elong n en base 10 */
 void	el_print_dec(elong n)
 {
 	if (n.high == 0)
@@ -33,6 +34,7 @@ void	el_print_dec(elong n)
 	}
 }
 
+/* Print un elong n en base 16 sous le format 0000000000000000.0000000000000000 */
 void 	el_print_hex_format(elong n)
 {
 	printf("%016lx.%016lx\n", n.high,n.low);
@@ -225,22 +227,46 @@ unsigned long int 	el_mod(elong n, unsigned long m)
 }
 
 /* Modular exponent : (a**b) mod m */
-// unsigned long int 	el_exp(unsigned long a, unsigned long b, unsigned long m)
-// {
+unsigned long int 	el_modular_exponent(unsigned long a, unsigned long b, unsigned long m)
+{
+	unsigned long int 	result,previous;
+	unsigned char       i;
 
-// }
+	previous = 1;
+
+	for (i = 1; i <= 64; i++)
+	{
+		if (cut(b,64-i,64-i) == 0)
+		{
+			result = ((previous * previous) % m);
+		}
+		else
+		{
+			result = ((((previous * previous) % m) * a) % m);
+		}
+
+		previous = result;
+	}
+
+	return	result;
+}
 
 int 	main(int argc, char** argv)
 {		
+	unsigned long m,a,b;
+	m = 0x0000000000008001;
+	a = 0x0000000000000060;
+	b = 0x000000000fffffff;
+
 	elong i;
 	i.high = 0x3;
 	i.low  = 0x0060000000000085;
 
 	el_print_hex_format(i);
 
-	printf("remainder modulus by %016lx : %016lx\n", 0x8fff0, el_mod(i,0x8fff0));
+	printf("remainder modulus by %016lx : %016lx\n", m, el_mod(i,m));
+
+	printf("modular exponent : %016lx ** %016lx mod %016lx : %016lx\n",a,b,m,el_modular_exponent(a,b,m));
 
 	exit(EXIT_SUCCESS);
-
-
 }
