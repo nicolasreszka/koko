@@ -193,6 +193,22 @@ void mOctet(unsigned char octet)
     }
   putchar('\n');
 }
+
+void muli(unsigned long int uli)
+{
+  int i;
+  unsigned long int buff[64];
+  unsigned long int mask = 0x1;
+  for ( i = 0 ; i < 64 ; i++ )
+    {
+      buff[i] = ( uli & (mask<<i) ) >> i;
+    }
+  for ( i = 63 ; i >= 0 ; i-- )
+    {
+      printf("%d",buff[i]);
+    }
+  putchar('\n');
+}
   
 
 
@@ -502,18 +518,42 @@ unsigned long int mask(unsigned char l,unsigned char r)
   }
   for ( i = 0 ; i <= l-r ; i++ )
   {
-    printf("mask : %lu\n", msk);
     res |= msk;
     msk <<= 1;
   }
   return res;
 }
 
+
+/* Fonction cut
+ *
+ * arguments : 
+ * unsigned long int x => variable à découper
+ * unsigned char l => borne gauche ( incluse )
+ * unsigned char r => borne droite ( incluse )
+ * 
+ * return :  unsigned long int => coupé en fonction des paramêtres et décalé vers la droite
+ *
+ * Exemple 1 : x = 0x80 , l = 7 , r = 7 => renvoie 0x1
+ * Exemple 2 : x = 0xf , l = 3 , r = 2 => renvoie 0x3 (11 en binaire)
+ */
 unsigned long int cut(unsigned long int x,unsigned char l,unsigned char r)
 {
   return (x&mask(l,r))>>r;
 }
 
+
+
+/* Fonction elshifr
+ *
+ * arguments : 
+ * struct elong a => variable à décaller
+ * unsigned char z => décaller a de z bits
+ *
+ * return : struct elong => contient le elong décaller de z vers la droite
+ *
+ * Cette fonction décalle un elong (a) de z bits vers la droite
+ */
 struct elong elshiftr(struct elong a, unsigned char z)
 {
   if ( z == 0 ) return a;
@@ -526,16 +566,26 @@ struct elong elshiftr(struct elong a, unsigned char z)
   else
   {
     a.l >>= z;
-    a.l |= cut(a.h,z,0);
+    a.l |= ( ( a.h &  mask(z-1,0) ) << (64-z) );
     a.h >>= z;
   }
   return a;
 }
 
+/* Fonction elshifl
+ *
+ * arguments : 
+ * struct elong a => variable à décaller
+ * unsigned char z => décaller a de z bits
+ *
+ * return : struct elong => contient le elong décaller de z vers la gauche
+ *
+ * Cette fonction décalle un elong (a) de z bits vers la gauche
+ */
 struct elong elshiftl(struct elong a, unsigned char z)
 {
   if ( z == 0 ) return a;
-  if ( z >= 64 )
+  else if ( z >= 64 )
   {
     a.h = a.l;
     a.h <<= z-64;
@@ -544,9 +594,10 @@ struct elong elshiftl(struct elong a, unsigned char z)
   else
   {
     a.h <<= z;
-    a.h |= ( a.l & mask(63,63-r));
+    a.h |= cut(a.l,63,64-z);
     a.l <<= z;
   }
+  return a;
 }
 
 
@@ -557,10 +608,18 @@ struct elong eladd(struct elong a,struct elong b )
   struct elong d;
   unsigned long int head_mask = 0x8000000000000000;
 
-  a63 = ( a.h & head_mask ) >> 63;
-  b63 = ( b.h & head_mask ) >> 63;
-  d.l = a.l+b.l;
-  d.h = a.h + b.h + a63 + b63;
+  a63 = ( a.l & head_mask ) >> 63;
+  b63 = ( b.l & head_mask ) >> 63;
+  if ( ( a63 + b63 ) == 2)
+  {
+    d.h = a.h + b.h + a63;
+    d.l = a.l+b.l;
+  }
+  else
+  {
+    d.h = a.h + b.h;
+    d.l = a.l + b.l + a63 + b63; 
+  }
 
   return d;
 

@@ -18,6 +18,7 @@ void permBitDiade(unsigned char * diade, unsigned int permListe[2]);
 void substNibbleOctet(unsigned char * octet, unsigned int substListe[16],int cycle);
 void substDiadeOctet(unsigned char * octet, unsigned int substListe[4],int cycle);
 void mOctet(unsigned char octet);
+void muli(unsigned long int uli);
 unsigned int key_shuffle_tea(unsigned int key[4],unsigned int demi, unsigned int delta, char test);
 void tea_encrypt_bloc(unsigned int tour, unsigned int key[4], unsigned int bloc[2]);
 void tea_decrypt_bloc(unsigned int tour, unsigned int key[4], unsigned int bloc[2]);
