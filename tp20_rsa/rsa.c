@@ -12,6 +12,16 @@
 ** - Le couple (n, d) est la clef privée, le "plain text" est : (b ** d) mod n 
 */
 
+
+/* Il faut donc coder : 
+** - alogrithme d'euclide 
+** - théorème de bézout 
+** - fonction d'euler
+** - generate_public_key(p,q)
+** - generate_private_key(k, p,q) avec k = e ou d
+*/
+
+
 /* Plus grand diviseur commun de a et b */
 unsigned long int	gcd(unsigned long int a, unsigned long int b)
 {

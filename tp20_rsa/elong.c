@@ -196,8 +196,6 @@ unsigned long int 	el_mod(elong n, unsigned long m)
 
 		divisor = el_shift_left(divisor,shift_length);
 
-		printf("%016lx\n", divisor.high);
-
 		result = n;
 
 		while (1)
