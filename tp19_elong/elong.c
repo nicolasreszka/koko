@@ -148,7 +148,7 @@ elong 	el_shift_left(elong n, unsigned char k)
 	return 	result;
 }
 
-/* Décalage de k vers la droite */
+/* Décalage de 1 vers la droite */
 elong 	el_shift_right(elong n)
 {
 	elong 	result;
@@ -238,11 +238,11 @@ unsigned long int 	el_modular_exponent(unsigned long a, unsigned long b, unsigne
 	{
 		if (cut(b,64-i,64-i) == 0)
 		{
-			result = ((previous * previous) % m);
+			result = el_mod(el_multiply(previous, previous), m);
 		}
 		else
 		{
-			result = ((((previous * previous) % m) * a) % m);
+			result = el_mod(el_multiply(el_mod(el_multiply(previous, previous), m), a), m);
 		}
 
 		previous = result;
@@ -254,9 +254,9 @@ unsigned long int 	el_modular_exponent(unsigned long a, unsigned long b, unsigne
 int 	main(int argc, char** argv)
 {		
 	unsigned long m,a,b;
-	m = 0x0000000000008001;
-	a = 0x0000000000000060;
-	b = 0x000000000fffffff;
+	m = 0x000000010070006f;
+	b = 0x02c830001;
+	a = 0xc724c788;
 
 	elong i;
 	i.high = 0x3;
