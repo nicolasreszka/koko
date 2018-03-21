@@ -145,23 +145,20 @@ int main(int argc, char const *argv[]) {
   printf("Phi(p, q) = %lu\n", phi);
   printf("\n\n\t\t e = %lu, phi = %ld\n", e, phi);
 
-  unsigned long d = findDecryptKeyFromBezout(bezout(e, phi), phi);
+  long d = findDecryptKeyFromBezout(bezout(e, phi), phi);
 
 
   printf("D = %ld\n", d);
   printf("private key found ! <%lu, %ld>\n", modulus, d);
 
-  printf("Modulus = %lu, e = %lu\n", modulus, e);
 
   encrypt_key encr_key = {modulus, e};
 
-  printf("<m, e>  = <%ld, %ld>\n", encr_key.m, encr_key.e);
 
   decrypt_key decr_key = {modulus, d};
 
-
-  printf("\n\n \t\t private key = <mod, d> <%ld, %ld>\n", decr_key.n, decr_key.d);
-  printf("\t\t public  key = <mod, e> <%ld, %ld>\n\n\n", encr_key.m, encr_key.e);
+  printf("\n\n\t\t public  key = <mod, e> <%ld, %ld>\n", encr_key.m, encr_key.e);
+  printf("\t\t private key = <mod, d> <%ld, %ld>\n\n\n", decr_key.n, decr_key.d);
 
 
   printf("\tChecking if D is correct...\n");
