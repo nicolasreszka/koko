@@ -158,15 +158,9 @@ elong 	el_twos_complement(elong n)
 {
 	elong           a,b;
 	unsigned char   i;
-
-	a.high = 0;
-	a.low  = 0;
-
-	for (i = 0; i < 64; i++)
-	{
-		a.high |= (cut(n.high,i,i) ^ 1) << i;
-		a.low  |= (cut(n.low ,i,i) ^ 1) << i;
-	}
+	
+	a.high = ~n.high;
+	a.low  = ~n.low;
 
 	b.high = 0;
 	b.low  = 1;
