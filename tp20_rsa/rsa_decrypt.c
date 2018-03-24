@@ -47,7 +47,7 @@ int 	main(int argc, char** argv)
 	{
 		block = 0x0;
 
-		read_result = read(file_in, &block, block_size);
+		read_result = read(file_in, &block, block_size+1);
 
 		if (read_result == -1)
 		{

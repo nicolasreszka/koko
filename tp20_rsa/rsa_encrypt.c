@@ -64,7 +64,7 @@ int 	main(int argc, char** argv)
 
 		block_pointer = (void*) &block;
 
-		for (i = 0; i < block_size; i++)
+		for (i = 0; i < block_size+1; i++)
 		{
 			write_result = write(file_out, block_pointer+i, 1);
 
