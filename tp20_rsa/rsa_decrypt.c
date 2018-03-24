@@ -6,8 +6,6 @@
 #include "errno.h"
 #include "elong.h"
 
-#define BLOCK_SIZE 	8
-
 int 	main(int argc, char** argv)
 {
 	if (argc < 5)
@@ -16,6 +14,7 @@ int 	main(int argc, char** argv)
 		exit(EXIT_FAILURE);
 	}
 
+	unsigned char        block_size;
 	unsigned long int    block, key, modulus;
 	int                  file_key, file_in, file_out;
 	ssize_t              read_result, write_result;
@@ -39,13 +38,15 @@ int 	main(int argc, char** argv)
 	key     = strtoul(argv[3],NULL,0);
 	modulus = strtoul(argv[4],NULL,0);
 
+	block_size = (64-zero_prefix(modulus))/8;
+
 	read_result = 1;
 
 	while (read_result > 0) 
 	{
 		block = 0x0;
 
-		read_result = read(file_in, &block, BLOCK_SIZE);
+		read_result = read(file_in, &block, block_size);
 
 		if (read_result == -1)
 		{
@@ -53,13 +54,13 @@ int 	main(int argc, char** argv)
 			exit(errno);
 		}
 
-		// printf("ptext %16lx\n", block);
+		printf("ptext %16lx\n", block);
 
 		block = el_modular_exponent(block,key,modulus);
 
-		// printf("ctext %16lx\n", block);
+		printf("ctext %16lx\n", block);
 
-		write_result = write(file_out, &block, BLOCK_SIZE);
+		write_result = write(file_out, &block, block_size-1);
 
 		if (write_result == -1)
 		{
@@ -67,7 +68,8 @@ int 	main(int argc, char** argv)
 			exit(errno);
 		}
 	}
-	// printf("end\n", block);
+	
+	printf("end\n");
 
 	close(file_in);
 	close(file_out);

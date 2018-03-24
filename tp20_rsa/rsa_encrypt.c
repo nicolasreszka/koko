@@ -6,8 +6,6 @@
 #include "errno.h"
 #include "elong.h"
 
-#define BLOCK_SIZE 	8
-
 int 	main(int argc, char** argv)
 {
 	if (argc < 5)
@@ -16,7 +14,8 @@ int 	main(int argc, char** argv)
 		exit(EXIT_FAILURE);
 	}
 
-	unsigned char        b[BLOCK_SIZE];
+	char*                block_pointer;
+	unsigned char        block_size, i;
 	unsigned long int    block, key, modulus;
 	int                  file_key, file_in, file_out;
 	ssize_t              read_result, write_result;
@@ -40,14 +39,15 @@ int 	main(int argc, char** argv)
 	key     = strtoul(argv[3],NULL,0);
 	modulus = strtoul(argv[4],NULL,0);
 
+	block_size = (64-zero_prefix(modulus))/8;
+
 	read_result = 1;
 
 	while (read_result > 0) 
 	{
 		block = 0x0;
-		memset(b,0x0,BLOCK_SIZE);
 
-		read_result = read(file_in, b, BLOCK_SIZE);
+		read_result = read(file_in, &block, block_size-1);
 
 		if (read_result == -1)
 		{
@@ -55,23 +55,27 @@ int 	main(int argc, char** argv)
 			exit(errno);
 		}
 
-		// printf("ptext %16lx\n", block);
-
-		memcpy(&block,b,BLOCK_SIZE);
+		printf("ptext %16lx\n", block);
 
 		block = el_modular_exponent(block,key,modulus);
 
-		// printf("ctext %16lx\n", block);
+		printf("ctext %16lx\n", block);
 
-		write_result = write(file_out, &block, BLOCK_SIZE);
+		block_pointer = (void*) &block;
 
-		if (write_result == -1)
+		for (i = 0; i < block_size; i++)
 		{
-			perror("write");
-			exit(errno);
+			write_result = write(file_out, block_pointer+i, 1);
+
+			if (write_result == -1)
+			{
+				perror("write");
+				exit(errno);
+			}
 		}
 	}
-	// printf("end\n", block);
+
+	printf("end\n");
 
 	close(file_in);
 	close(file_out);
