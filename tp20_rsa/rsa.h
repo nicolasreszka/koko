@@ -23,6 +23,7 @@ typedef struct rsa_private_key_s
 	unsigned long int 	n;
 } rsa_private_key;
 
+/* Verifie si un nombre est premier */
 int 	is_prime(unsigned long int n);
 
 /* Propritété de la fonction d'euler : phi(p*q) = (p-1) * (q-1) */
@@ -34,8 +35,10 @@ unsigned long int	euclide(unsigned long int a, unsigned long int b);
 /* Théorème de Bézout, renvoie l'identité de Bézout : ax + by = gcd(a,b)*/
 bezout_identity 	bezout(unsigned long int a, unsigned long int b);
 
+/* Choisit e < phi tel que e et phi premiers entre eux */
 rsa_public_key	rsa_generate_public_key(unsigned long int p, unsigned long int q);
 
+/* Choisit d < phi tel que (e * d) % phi == 1 */
 rsa_private_key	rsa_generate_private_key(rsa_public_key public_key, unsigned long int p, unsigned long int q);
 
 #endif

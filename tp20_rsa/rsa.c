@@ -13,6 +13,7 @@
 ** - Le couple (n, d) est la clef privée, le "plain text" est : (b ** d) mod n 
 */
 
+/* Verifie si un nombre est premier */
 int 	is_prime(unsigned long int n)
 {
 	int 	i, result;
@@ -23,14 +24,17 @@ int 	is_prime(unsigned long int n)
 	{
 		result = 0;
 	}
-
-	for (i = 3; i < n / 2; i += 2)
-	{
-		if (n % i == 0) 
+	else
+	{	
+		for (i = 3; i < n / 2; i += 2)
 		{
-			result = 0;
+			if (n % i == 0) 
+			{
+				result = 0;
+			}
 		}
 	}
+
 
 	return 	result;
 }
@@ -89,6 +93,7 @@ bezout_identity 	bezout(unsigned long int a, unsigned long int b)
 	return result;
 }
 
+/* Choisit e < phi tel que e et phi premiers entre eux */
 rsa_public_key	rsa_generate_public_key(unsigned long int p, unsigned long int q)
 {
 	rsa_public_key      result;
@@ -107,6 +112,7 @@ rsa_public_key	rsa_generate_public_key(unsigned long int p, unsigned long int q)
 	return 	result;
 }
 
+/* Choisit d < phi tel que (e * d) % phi == 1 */
 rsa_private_key	rsa_generate_private_key(rsa_public_key public_key, unsigned long int p, unsigned long int q)
 {
 	rsa_private_key 	result;
