@@ -39,6 +39,7 @@ int 	main(int argc, char** argv)
 	modulus = strtoul(argv[4],NULL,0);
 
 	block_size = (64-zero_prefix(modulus))/8;
+	printf("block size = %d\n", block_size);
 
 	read_result = 1;
 
