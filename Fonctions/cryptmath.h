@@ -7,6 +7,12 @@ struct elong
 	unsigned long int l;
 };
 
+struct three_coeff_egcd{
+	unsigned long int gcd;
+	long int u;
+	long int v;
+};
+
 void rotOctetD(unsigned char * octet,int cycle);
 void rotOctetG(unsigned char * octet, int cycle);
 void rotNibbleD(unsigned char * nibble,int cycle);
@@ -19,6 +25,7 @@ void substNibbleOctet(unsigned char * octet, unsigned int substListe[16],int cyc
 void substDiadeOctet(unsigned char * octet, unsigned int substListe[4],int cycle);
 void mOctet(unsigned char octet);
 void muli(unsigned long int uli);
+void aff_elong_hex(struct elong e);
 unsigned int key_shuffle_tea(unsigned int key[4],unsigned int demi, unsigned int delta, char test);
 void tea_encrypt_bloc(unsigned int tour, unsigned int key[4], unsigned int bloc[2]);
 void tea_decrypt_bloc(unsigned int tour, unsigned int key[4], unsigned int bloc[2]);
@@ -33,5 +40,6 @@ unsigned long int elexpm(unsigned long x, unsigned long y, unsigned long m);
 struct elong elshiftl(struct elong a, unsigned char z);
 struct elong elshiftr(struct elong a, unsigned char z);
 struct elong elsub(struct elong a,struct elong b);
+struct three_coeff_egcd * egcd(unsigned long int a,unsigned long int b);
 
 #endif

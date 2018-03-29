@@ -209,6 +209,11 @@ void muli(unsigned long int uli)
     }
   putchar('\n');
 }
+
+void aff_elong_hex(struct elong e)
+{
+  printf("%lx.%lx\n",e.h,e.l);
+}
   
 
 
@@ -493,6 +498,33 @@ void tea_decrypt_file(char * file_name,unsigned int key[4],unsigned int tour)
 }
 
 
+unsigned long int get_dh_generator(unsigned  long int x)
+{
+    
+}
+
+
+unsigned char zero_prefix(unsigned long int x)
+{
+  unsigned long int    m;
+  unsigned char        counter;
+
+  m       = 0x8000000000000000;
+  counter = 0;
+
+  while (1) 
+  {
+    if ((x & m) != 0)
+    {
+      break;
+    }
+
+    counter++;
+    m >>= 1;
+  }
+
+  return counter;
+}
 
 /* Fonction mask
  * 
@@ -603,29 +635,188 @@ struct elong elshiftl(struct elong a, unsigned char z)
 
 struct elong eladd(struct elong a,struct elong b )
 {
-  unsigned long int a63;
-  unsigned long int b63;
+  unsigned long int z,u;
+  struct elong sum;
+
+  z = cut(a.l, 62,  0) + cut(b.l, 62,  0);
+  u = cut(a.l, 63, 63) + cut(b.l, 63, 63) + cut(z,63,63); 
+
+  sum.h = a.h + b.h + cut(u,1,1);
+  sum.l = (cut(u,0,0)<<63)| cut(z,62,0);
+
+  return sum;
+}
+
+
+
+struct elong elsub(struct elong a,struct elong b )
+{
   struct elong d;
-  unsigned long int head_mask = 0x8000000000000000;
-
-  a63 = ( a.l & head_mask ) >> 63;
-  b63 = ( b.l & head_mask ) >> 63;
-  if ( ( a63 + b63 ) == 2)
-  {
-    d.h = a.h + b.h + a63;
-    d.l = a.l+b.l;
-  }
-  else
-  {
-    d.h = a.h + b.h;
-    d.l = a.l + b.l + a63 + b63; 
-  }
-
+  b.h = ~b.h;
+  b.l = ~b.l;
+  b = eladd(b,(struct elong){0,1});
+  d = eladd(a,b);
   return d;
 
 }
 
+unsigned long int elmod(struct elong n, unsigned long m)
+{
+  unsigned char shift_length;
+  struct elong result,divisor;
+
+  if (n.h == 0)
+  {
+    result.l = n.l % m;
+  }
+  else
+  {
+    shift_length = (64 + zero_prefix(m))-1;
+
+    divisor.h = 0;
+    divisor.l  = m;
+
+    divisor = elshiftl(divisor,shift_length);
+
+    result = n;
+
+    while (1)
+    {
+      if (result.h == 0 && result.l < m) 
+      {
+        break;
+      }
+      
+      if ((result.h > divisor.h) 
+      || (result.h == divisor.h && result.l >= divisor.l))
+      {
+        result = eladd(result,(struct elong){~divisor.h,~divisor.l});
+      }
+
+      divisor = elshiftr(divisor,1);
+    }
+  }
+
+return result.l;
+  
+}
+
 struct elong elmul(unsigned long a, unsigned long b)
 {
+  unsigned long int a_high, a_low, b_high, b_low;
+  struct elong z1, z2, z3, z4;
+
+  a_high  = cut(a,63,32);
+  a_low   = cut(a,31, 0);
+
+  b_high  = cut(b,63,32);
+  b_low   = cut(b,31, 0);
+
+  z1.h = a_high * b_high;
+  z1.l  = 0;
+
+  z2.h = cut(a_high * b_low , 63, 32);
+  z2.l  = cut(a_low  * b_high, 31,  0) << 32;
+
+  z3.h = cut(a_low  * b_high, 63, 32);
+  z3.l  = cut(a_high * b_low , 31,  0) << 32;
+
+  z4.h = 0;
+  z4.l  = a_low * b_low;
+
+  return eladd(z1,eladd(z2,eladd(z3,z4)));
+}
+
+
+unsigned long int elexpm(unsigned long x, unsigned long y, unsigned long m)
+{
+  unsigned long int   result,previous;
+  unsigned char       i;
+
+  previous = 1;
+
+  for (i = 1; i <= 64; i++)
+  {
+    if (cut(y,64-i,64-i) == 0)
+    {
+      result = elmod(elmul(previous, previous), m);
+    }
+    else
+    {
+      result = elmod(elmul(elmod(elmul(previous, previous), m), x), m);
+    }
+
+    previous = result;
+  }
+
+return  result;
+}
+
+struct three_coeff_egcd * egcd(unsigned long int a,unsigned long int b)
+{
+  unsigned long int reste;
+  unsigned long int quotient;
+  long int u0,u1,u;
+  long int v0,v1,v;
+  struct three_coeff_egcd * result;
+  if ( a < b ) return NULL;
+  if ( b <= 0 ) return NULL;
+  result = calloc(sizeof(struct three_coeff_egcd),1);
+  u0 = 1;
+  v0 = 0;
+  u = 0;
+  v = 1;
+  while(1)
+  {
+    quotient = a/b;
+    reste = a%b;
+    if ( reste == 0 ) break;
+    a=b;
+    b=reste;
+    u1 = u;
+    v1 = v;
+    u = u0 - u1*quotient;
+    v = v0 - v1*quotient;
+    u0 = u1;
+    v0 = v1;
+    /* printf("dividende : %5ld, diviseur : %5ld, quotient : %5ld,reste : %5ld, u : %5ld , v : %ld \n",a,b,quotient,reste,u,v); */
+  }
+  printf("dividende : %5ld, diviseur : %5ld, quotient : %5ld,reste : %5ld, u : %5ld , v : %ld \n",a,b,quotient,reste,u,v);
+  result->u = u;
+  result->v = v;
+  result->gcd = b;
+  return result;
+}
+
+unsigned long int rsa_encrypt_bloc(struct elong bloc,unsigned long int pub_key,unsigned long int modulus)
+{
+  unsigned long int z;
+  z = elexpm(bloc,pub_key,modulus);
+  return z;
+}
+
+void rsa_decrypt_bloc(struct elong bloc,unsigned long int priv_key,unsigned long int modulus)
+{
+
+}
+
+void rsa_encrypt_file(char * name,unsigned long int pub_key,unsigned long int modulus)
+{
+  int input_file_descriptor;
+  int buffer_file_descriptor;
+  input_file_descriptor = open(name,O_RDONLY,0444);
+  if ( input_file_descriptor < 0 )
+  {
+    perror("rsa_encrypt_file(cryptmath.c : erreur lors du open input_file en readonly ");
+    exit(-1);
+  }
+  buffer_file_descriptor = open("buffer.dat",O_WRONLY,0644);
+  if ( buffer_file_descriptor < 0 )
+  {
+    perror("rsa_encrypt_file(cryptmath.c : erreur lors du open buffer_file en writeonly ");
+    exit(-1);
+  }
+
+  
 
 }
