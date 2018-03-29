@@ -13,7 +13,23 @@
 #include "serveur.h"
 #include "client.h"
 
-void srvtcpson(int nid,struct sockaddr_in* serv)
+
+void dh_client_routine(int sfd,struct sockaddr_in* serv)
+{
+	/*
+	################################################
+	           A CODER ( send, recv... )
+
+	           exemple :
+	           	envoi de int x = 10
+	           	send(nid,&x,sizeof(int),0);
+	################################################
+
+	*/ 
+	exit(0);
+}
+
+void dh_serv_routine(int nid,struct sockaddr_in* serv)
 {
 	/*
 	################################################
@@ -29,5 +45,10 @@ void srvtcpson(int nid,struct sockaddr_in* serv)
 
 void dh_serveur(char* port)
 {
-	runsrvtcp(port,&srvtcpson);
+	runsrvtcp(port,&dh_serv_routine);
+}
+
+void dh_client(char* addresse,char* port)
+{
+	runclttcp(addresse,port,&dh_client_routine);
 }

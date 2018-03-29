@@ -1,7 +1,6 @@
-#ifndef H_GL_SERVEUR
-#define H_GL_SERVEUR
+#ifndef H_GL_CLIENT
+#define H_GL_CLIENT
 
-void routinecltclient(int sfd,struct sockaddr_in* serv);
-void runclttcp(char* addresse,char* port);
+void runclttcp(char* addresse,char* port,void (*routinecltclient)(int, struct sockaddr_in*));
 
 #endif

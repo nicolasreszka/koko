@@ -10,6 +10,14 @@
 /* ATTENTION, les fonctions non commentés ne doivent pas être utilisés, risque de bug et/ou de perte de données. */
 
 
+
+/* Effectue une rotation vers la droite d'un octet (type unsigned char de préférence)
+   Demande l'addresse de l'octet à modifier en premier argument
+   Demande le nombre de bit de rotation à effectuer lors de la rotation
+   ( Si cycle = 1 alors la rotation ne tournera que sur un bit 
+     exemple : 00000001 => 10000000 
+               00100000 => 00010000 )
+*/
 void rotOctetD(unsigned char * octet,int cycle)
 {
   unsigned char buff,mask = 0x1;
@@ -24,6 +32,13 @@ void rotOctetD(unsigned char * octet,int cycle)
     }
 }
 
+/* Effectue une rotation vers la gauche d'un octet (type unsigned char de préférence)
+   Demande l'addresse de l'octet à modifier en premier argument
+   Demande le nombre de bit de rotation à effectuer lors de la rotation
+   ( Si cycle = 1 alors la rotation ne tournera que sur un bit 
+     exemple : 10000000 => 00000001 
+               00100000 => 01000000 )
+*/
 void rotOctetG(unsigned char * octet, int cycle)
 {
   unsigned char buff,mask = 0x80;
@@ -786,37 +801,4 @@ struct three_coeff_egcd * egcd(unsigned long int a,unsigned long int b)
   result->v = v;
   result->gcd = b;
   return result;
-}
-
-unsigned long int rsa_encrypt_bloc(struct elong bloc,unsigned long int pub_key,unsigned long int modulus)
-{
-  unsigned long int z;
-  z = elexpm(bloc,pub_key,modulus);
-  return z;
-}
-
-void rsa_decrypt_bloc(struct elong bloc,unsigned long int priv_key,unsigned long int modulus)
-{
-
-}
-
-void rsa_encrypt_file(char * name,unsigned long int pub_key,unsigned long int modulus)
-{
-  int input_file_descriptor;
-  int buffer_file_descriptor;
-  input_file_descriptor = open(name,O_RDONLY,0444);
-  if ( input_file_descriptor < 0 )
-  {
-    perror("rsa_encrypt_file(cryptmath.c : erreur lors du open input_file en readonly ");
-    exit(-1);
-  }
-  buffer_file_descriptor = open("buffer.dat",O_WRONLY,0644);
-  if ( buffer_file_descriptor < 0 )
-  {
-    perror("rsa_encrypt_file(cryptmath.c : erreur lors du open buffer_file en writeonly ");
-    exit(-1);
-  }
-
-  
-
 }
